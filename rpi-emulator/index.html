@@ -1,0 +1,21 @@
+<h1>RPI Emulator</h1>
+<script>
+let socket = new WebSocket("ws://localhost:3031");
+
+socket.onmessage = function(event) {
+  console.dir(JSON.parse(event.data));
+};
+
+socket.onclose = function(event) {
+  if (event.wasClean) {
+    console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+  } else {
+    console.log('[close] Connection died');
+  }
+  window.location.reload();
+};
+
+socket.onerror = function(error) {
+  alert(`[error]`);
+};
+</script>
