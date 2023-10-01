@@ -19,8 +19,8 @@ app.get('/output/:id/:state', (req, res) => {
   if (!GPIO_PORTS[req.params.id]) {
     GPIO_PORTS[req.params.id] = new Gpio(req.params.id, 'out');
   }
-  GPIO_PORTS[req.params.id].writesync(req.params.state);
-  res.send();
+  GPIO_PORTS[req.params.id].writesync(req.params.state === 'on' ? 1 : 0);
+  res.json({success: true});
 });
 
 app.listen(port, () => {

@@ -4,8 +4,8 @@
   "description": "Smart Automatic Watering Controller",
   "main": "server.js",
   "scripts": {
-    "server": "supervisor server.js",
-    "emulator": "supervisor rpi-emulator/watcher.js & http-server rpi-emulator/ -p 3030"
+    "start": "supervisor server.js",
+    "emulator": "supervisor rpi-emulator/watcher.js & http-server rpi-emulator/ -p 3030 -o"
   },
   "author": "",
   "license": "ISC",
