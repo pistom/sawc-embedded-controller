@@ -15,11 +15,19 @@ if (isPi()) {
 
 const GPIO_PORTS = {};
 
+const plantsMap = {
+  1: 2,
+  2: 3,
+  3: 4,
+  4: 14,
+}
+
 app.get('/output/:id/:state', (req, res) => {
-  if (!GPIO_PORTS[req.params.id]) {
-    GPIO_PORTS[req.params.id] = new Gpio(req.params.id, 'out');
+  const gpioNumber = plantsMap[req.params.id];
+  if (!GPIO_PORTS[gpioNumber]) {
+    GPIO_PORTS[gpioNumber] = new Gpio(gpioNumber, 'out');
   }
-  GPIO_PORTS[req.params.id].writeSync(req.params.state === 'on' ? 1 : 0);
+  GPIO_PORTS[gpioNumber].writeSync(req.params.state === 'on' ? 1 : 0);
   res.json({success: true});
 });
 

@@ -20,4 +20,28 @@ time, mark, audio, video {
 	vertical-align: baseline;
 	box-sizing: border-box;
 }
-
+body {
+  padding: 10px;
+}
+#gpio table {
+  border-collapse: collapse;
+  border-width: 0 0 1px 1px;
+  border-color: black;
+  border-style: solid;
+}
+#gpio table td {
+  border-width: 1px 1px 0 0;
+  border-color: black;
+  border-style: solid;
+  padding: 0 6px;
+}
+.gpio {
+  width: 20px;
+  height: 20px;
+}
+.gpio_high {
+	background-color: green;
+}
+.gpio_high.gpio_in {
+	background-color: red;
+}

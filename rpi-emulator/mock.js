@@ -1,20 +1,30 @@
 const fs = require('fs');
+const { createFileIfNotExists, stateFile } = require('./utils');
 
-function writeStatus(device, pin, status) {
-  const state = JSON.parse(fs.readFileSync('./rpi-emulator/state.json', 'utf8'));
-  if (!state[device]) {
-    state[device] = {};
+function writeStatus(device, pin, status, dir) {
+  createFileIfNotExists(stateFile);
+  const fileContent = fs.readFileSync(stateFile, 'utf8')
+  if (fileContent) {
+    const state = JSON.parse(fileContent);
+    if (!state[device]) {
+      state[device] = {};
+    }
+    if (!state[device][pin]) {
+      state[device][pin] = [];
+    }
+    state[device][pin] = [dir, status];
+    fs.writeFile(stateFile, JSON.stringify(state), (err) => {
+      if (err) throw err;
+    });
   }
-  state[device][pin] = status;
-  fs.writeFile('./rpi-emulator/state.json', JSON.stringify(state), (err) => {
-    if (err) throw err;
-  });
 }
 
 function Gpio(number, direction) {
+  writeStatus('GPIO', number, 0, direction);
   return {
-    writeSync: (value) => {
-      writeStatus('GPIO', number, value);
+    direction,
+    writeSync: function (value) {
+      writeStatus('GPIO', number, value, this.direction);
     }
   };
 }

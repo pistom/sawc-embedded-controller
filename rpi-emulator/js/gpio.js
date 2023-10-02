@@ -54,14 +54,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
       cell.innerHTML = pins[i].number;
       row.appendChild(cell);
       cell = document.createElement("td");
-      cell.id = `gpio_${pins[i].number}`;
-      cell.innerHTML = "LOW";
+      cell.id = `${pins[i].name}`;
+      cell.classList.add("gpio");
       row.appendChild(cell);
       table.appendChild(row);
     } else {
       cell = document.createElement("td");
-      cell.id = `gpio_${pins[i].number}`;
-      cell.innerHTML = "LOW";
+      cell.id = `${pins[i].name}`;
+      cell.classList.add("gpio");
       row.appendChild(cell);
       cell = document.createElement("td");
       cell.innerHTML = pins[i].number;
