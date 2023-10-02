@@ -13,7 +13,7 @@ function writeStatus(device, pin, status) {
 
 function Gpio(number, direction) {
   return {
-    writesync: (value) => {
+    writeSync: (value) => {
       writeStatus('GPIO', number, value);
     }
   };
