@@ -21,27 +21,34 @@ time, mark, audio, video {
 	box-sizing: border-box;
 }
 body {
-  padding: 10px;
+  text-align: center;
+  background-color: #2e3440;
+  color: #d8dee9;
+  background-image: url('../images/diagram.svg');
+  background-repeat: no-repeat;
+  background-position: top left;
+  min-height: 2000px;
 }
-#gpio table {
-  border-collapse: collapse;
-  border-width: 0 0 1px 1px;
-  border-color: black;
-  border-style: solid;
+#gpio {
+  width: 40px;
+  position: absolute;
+  top: 120.5px;
+  left: 370.5px;
+  line-height: 0;
 }
-#gpio table td {
-  border-width: 1px 1px 0 0;
-  border-color: black;
-  border-style: solid;
-  padding: 0 6px;
+.pin {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 5px;
+  border: 1px solid white;
+  border-radius: 10px;
 }
-.gpio {
-  width: 20px;
-  height: 20px;
+#gpio .pin:nth-child(even) {
 }
 .gpio_high {
-	background-color: green;
+	background-color: #83ad5f;
 }
 .gpio_high.gpio_in {
-	background-color: red;
+	background-color: #bf616a;
 }

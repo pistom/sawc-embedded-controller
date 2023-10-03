@@ -1,10 +1,11 @@
 const fs = require('fs');
 const express = require('express');
-const { createFileIfNotExists, stateFile } = require('./utils');
+const { createFileIfNotExists, stateFile, emptyFile } = require('./utils');
 const app = express();
 const port = 3031;
 const expressWs = require('express-ws')(app);
 createFileIfNotExists(stateFile);
+emptyFile(stateFile);
 
 app.ws('/', function (ws, req) {
   ws.on('message', function (msg) {

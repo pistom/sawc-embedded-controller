@@ -6,3 +6,6 @@ node_modules/
 .npm
 # dotenv environment variable files
 .env
+# Diagrams
+*.bkp
+*.dtmp

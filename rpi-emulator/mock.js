@@ -13,9 +13,7 @@ function writeStatus(device, pin, status, dir) {
       state[device][pin] = [];
     }
     state[device][pin] = [dir, status];
-    fs.writeFile(stateFile, JSON.stringify(state), (err) => {
-      if (err) throw err;
-    });
+    fs.writeFileSync(stateFile, JSON.stringify(state));
   }
 }
 

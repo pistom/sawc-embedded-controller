@@ -9,7 +9,12 @@ const createFileIfNotExists = fileName => {
   }
 }
 
+const emptyFile = fileName => {
+  fs.writeFileSync(fileName, '{}');
+}
+
 module.exports = {
   stateFile,
+  emptyFile,
   createFileIfNotExists,
 };
