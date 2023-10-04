@@ -13,6 +13,10 @@ const emptyFile = fileName => {
   fs.writeFileSync(fileName, '{}');
 }
 
+const deleteFile = fileName => {
+  fs.unlinkSync(fileName);
+}
+
 module.exports = {
   stateFile,
   emptyFile,

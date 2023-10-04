@@ -28,6 +28,7 @@ body {
   background-repeat: no-repeat;
   background-position: top left;
   min-height: 2000px;
+  min-width: 1600px;
 }
 #gpio {
   width: 40px;
@@ -48,7 +49,22 @@ body {
 }
 .gpio_high {
 	background-color: #83ad5f;
+  box-shadow: #83ad5f 0 0 8px 4px;
+  animation: blink .3s infinite;
 }
 .gpio_high.gpio_in {
 	background-color: #bf616a;
+  box-shadow: #bf616a 0 0 5px 3px;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 1;
+  }
 }

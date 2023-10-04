@@ -15,6 +15,7 @@
     "express": "^4.18.2",
     "express-ws": "^5.0.2",
     "http-server": "^14.1.1",
+    "node-mcp23017": "^0.1.0",
     "onoff": "^6.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -18,15 +18,15 @@ let pins = [
   { name: "3.3V", number: 17 },
   { name: "GPIO24", number: 18 },
   { name: "GPIO10", number: 19 },
-  { name: "GPIO9", number: 20 },
   { name: "GND", number: 21 },
+  { name: "GPIO9", number: 20 },
   { name: "GPIO25", number: 22 },
   { name: "GPIO11", number: 23 },
   { name: "GPIO8", number: 24 },
-  { name: "GPIO7", number: 25 },
   { name: "GND", number: 26 },
-  { name: "GPIO0", number: 27 },
-  { name: "GPIO1", number: 28 },
+  { name: "GPIO7", number: 25 },
+  { name: "ID_SD", number: 27 },
+  { name: "ID_SC", number: 28 },
   { name: "GPIO5", number: 29 },
   { name: "GND", number: 30 },
   { name: "GPIO6", number: 31 },
@@ -54,5 +54,4 @@ document.addEventListener("DOMContentLoaded", function (event) {
     cell.classList.add("gpio", "pin");
     gpio.appendChild(cell);
   }
-  test.appendChild(table);
 });
