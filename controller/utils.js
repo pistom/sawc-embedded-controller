@@ -1,4 +1,4 @@
-const sleep = m => new Promise(r => setTimeout(r, m))
+const sleep = sec => new Promise(r => setTimeout(r, sec*1000));
 
 module.exports = {
 	sleep,

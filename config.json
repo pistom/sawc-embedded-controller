@@ -3,53 +3,53 @@
     "MODULE_01": {
       "name": "Module 1",
       "type": "MCP23017",
-      "address": "0x27",
+      "address": 39,
       "outputs": {
         "1": {
-          "pin": "B0"
+          "pin": 8
         },
         "2": {
-          "pin": "A6"
+          "pin": 6
         },
         "3": {
-          "pin": "B1"
+          "pin": 9
         },
         "4": {
-          "pin": "A5"
+          "pin": 5
         },
         "5": {
-          "pin": "B2"
+          "pin": 10
         },
         "6": {
-          "pin": "A4"
+          "pin": 4
         },
         "7": {
-          "pin": "B3"
+          "pin": 11
         },
         "8": {
-          "pin": "A3"
+          "pin": 3
         },
         "9": {
-          "pin": "B4"
+          "pin": 12
         },
         "10": {
-          "pin": "A2"
+          "pin": 2
         },
         "11": {
-          "pin": "B5"
+          "pin": 13
         },
         "12": {
-          "pin": "A1"
+          "pin": 1
         },
         "13": {
-          "pin": "B6"
+          "pin": 14
         },
         "14": {
-          "pin": "A0"
+          "pin": 0
         }
       },
       "input": {
-        "pin": "A7"
+        "pin": 7
       }
     }
   }

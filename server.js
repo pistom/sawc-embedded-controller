@@ -6,7 +6,7 @@ const port = 3001;
 app.use(cors());
 
 const MCP23017 = require('node-mcp23017');
-const { water } = require('./controller/controller.js');
+const { startWater } = require('./controller/controller.js');
 
 let GPIO
 if (isPi()) {
@@ -16,11 +16,13 @@ if (isPi()) {
 }
 
 const GPIO_PORTS = {};
-const MCP23017_PORTS = {};
 
 
-app.get('/output/:id/:state', (req, res) => {
-  water("MODULE_01", 1, 1000);
+app.get('/water/:device/:output/:duration', (req, res) => {
+  startWater(
+    req.params.device,
+    req.params.output,
+    parseInt(req.params.duration));
   res.json({ success: true });
 });
 

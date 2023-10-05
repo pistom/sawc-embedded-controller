@@ -1,3 +1,4 @@
+const { MODE_OUTPUT } = require('@mrvanosh/mcp23x17');
 const fs = require('fs');
 const { createFileIfNotExists, stateFile } = require('./utils');
 
@@ -27,6 +28,27 @@ function Gpio(number, direction) {
   };
 }
 
+function MCP23x17(device) {
+  return {
+    begin: function () {
+      return new Promise((resolve, reject) => {
+        resolve();
+      });
+    },
+    mode: function (pin, mode, value) {
+      writeStatus(device, pin, value, mode === MODE_OUTPUT ? 'out' : 'in');
+      return new Promise((resolve, reject) => {
+        resolve({
+          write: function (value) {
+            writeStatus(device, pin, value, mode === MODE_OUTPUT ? 'out' : 'in');
+          }
+        });
+      });
+    }
+  }
+}
+
 module.exports = {
   Gpio,
+  MCP23x17,
 };
