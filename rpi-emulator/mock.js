@@ -24,6 +24,9 @@ function Gpio(number, direction) {
     direction,
     writeSync: function (value) {
       writeStatus('GPIO', number, value, this.direction);
+    },
+    unexport: function () {
+      writeStatus('GPIO', number, 0, this.direction);
     }
   };
 }

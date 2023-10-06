@@ -1,61 +1,39 @@
-const { i2c, MODE_OUTPUT, OUTPUT_HIGH, OUTPUT_LOW } = require('@mrvanosh/mcp23x17');
-const config = require('../config');
+const { initOutput } = require('../devices/mcp23x17');
+const { initQueue, countDown, unqueue } = require('./queues');
 const { sleep } = require('./utils');
-const isPi = require('detect-rpi');
 
-const devices = {};
+const devices = require('../devices').devices;
 
-
-const initDevice = async (device) => {
-  let MCP23x17;
-  let bus;
-  let mcp;
-  if (isPi()) {
-    const { MCP23x17 } = require('@mrvanosh/mcp23x17');
-    bus = new i2c(1);
-    mcp = new MCP23x17(bus, config.devices[device].address);
-  } else {
-    MCP23x17 = require('../rpi-emulator/mock.js').MCP23x17;
-    bus = null;
-    mcp = new MCP23x17(device);
-  }
-  await mcp.begin();
-
-  devices[device] = devices[device] || {};
-  devices[device].bus = bus;
-  devices[device].mcp = mcp;
-  devices[device].outputs = {};
-}
-
-const initOutput = async (device, output) => {
-  if (!devices[device]) {
-    await initDevice(device);
-  }
-
-  if (!devices[device].outputs[output]) {
-    devices[device].outputs[output] = await devices[device]
-      .mcp
-      .mode(
-        config.devices[device].outputs[output].pin,
-        MODE_OUTPUT,
-        OUTPUT_LOW
-      );
-  }
-}
-
+/**
+ * 
+ * @param {string} device 
+ * @param {string} output 
+ * @param {number} duration 
+ */
 const startWater = async (device, output, duration) => {
+  const queue = initQueue(device);
+  queue.push({ output, duration });
+  const timeSum = queue.reduce((acc, cur) => acc + cur.duration, 0);
+  await sleep((timeSum - duration) + 1);
+
   if (!devices[device]?.outputs[output]) {
     await initOutput(device, output);
   }
   devices[device].outputs[output].write(1);
-  await sleep(duration);
+  await countDown(device);
   stopWater(device, output);
 }
 
+/**
+ * 
+ * @param {string} device 
+ * @param {string} output 
+ */
 const stopWater = (device, output) => {
-  devices[device].outputs[output].write(0);
+  unqueue(device, output);
 }
 
 module.exports = {
   startWater,
+  stopWater,
 }

@@ -3,6 +3,8 @@ let socket = new WebSocket("ws://localhost:3031");
 socket.onopen = function(e) {
   socket.send("Emulator connected!");
 };
+
+
 socket.onmessage = function(event) {
   const state = JSON.parse(event.data);
   const gpioState = state.GPIO;

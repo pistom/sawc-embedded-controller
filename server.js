@@ -5,35 +5,29 @@ const app = express();
 const port = 3001;
 app.use(cors());
 
-const MCP23017 = require('node-mcp23017');
-const { startWater } = require('./controller/controller.js');
-
-let GPIO
-if (isPi()) {
-  GPIO = require('onoff').Gpio;
-} else {
-  GPIO = require('./rpi-emulator/mock.js').Gpio;
-}
-
-const GPIO_PORTS = {};
+const { startWater, stopWater } = require('./controller/controller.js');
+const { setGpio } = require('./devices/gpio.js');
 
 
-app.get('/water/:device/:output/:duration', (req, res) => {
-  startWater(
+app.get('/water/:device/:output/:duration', async (req, res) => {
+  await startWater(
     req.params.device,
     req.params.output,
     parseInt(req.params.duration));
-  res.json({ success: true });
+  res.json({ status: 'success', device: req.params.device, output: req.params.output });
+});
+
+app.get('/stop-water/:device/:output', async (req, res) => {
+  stopWater(
+    req.params.device,
+    req.params.output);
+  res.json({ status: 'aborted', device: req.params.device, output: req.params.output });
 });
 
 
-app.get('/test', (req, res) => {
-  const gpioNumber = plantsMap[req.params.id];
-  if (!GPIO_PORTS[gpioNumber]) {
-    GPIO_PORTS[gpioNumber] = new GPIO(gpioNumber, 'out');
-  }
-  GPIO_PORTS[gpioNumber].writeSync(req.params.state === 'on' ? 1 : 0);
-  res.json({ success: true });
+app.get('/gpio/:number/:state', (req, res) => {
+  setGpio(req.params.number, 'out', req.params.state === 'on' ? 1 : 0);
+  res.json({ status: 'success' });
 });
 
 app.listen(port, () => {

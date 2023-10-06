@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "supervisor server.js",
-    "emulator": "supervisor rpi-emulator/watcher.js & http-server rpi-emulator/ -p 3030 -o"
+    "emulator": "node rpi-emulator/watcher.js & http-server rpi-emulator/ -p 3030 -o",
+    "dev": "npm start & npm run emulator"
   },
   "author": "",
   "license": "ISC",
