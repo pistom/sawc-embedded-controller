@@ -1,40 +1,63 @@
 const { sleep } = require('./utils');
+const { QueueType } = require('../types')
 
+/**
+ * @type {Object.<string, QueueType>}
+ */
 const queues = {};
 
-const initQueue = device => {
-  if (!queues[device]) {
-    queues[device] = [];
+class Queue {
+  constructor(device) {
+    this.queue = [];
+    this.device = device;
   }
-  return queues[device];
+
+  add(output, duration, startCallback, endCallback) {
+    this.queue.push({ output, duration, startCallback, endCallback });
+  }
+
+  unqueue(output) {
+    const message = this.queue.find(item => item.output === output);
+    this.queue = this.queue.filter(item => item.output !== output);
+    return message;
+  }
+
+  shift() {
+    // console.log('shift', this.queue)
+    return this.queue.shift();
+  }
 }
 
-const countDown = async device => {
-  console.log(queues[device]);
-  if (!queues[device]?.length) {
-    return;
+class Consumer {
+  constructor(queues, device, io) {
+    this.queues = queues;
+    this.queue = queues[device];
+    this.io = io;
+    this.device = device;
   }
-  queues[device][0].duration--;
-  if (queues[device][0].duration === 0) {
-    queues[device].shift();
-  } else {
-    await sleep(1);
-    await countDown(device);
-  }
-}
 
-const unqueue = (device, output) => {
-  console.log('unqueue', device, output);
-  const queue = initQueue(device);
-  const index = queue.findIndex(q => q.output === output);
-  if (index !== -1) {
-    queue.splice(index, 1);
+  async consume() {
+    const queues  = this.queues;
+    const io = this.io;
+    const device = this.device;
+    const queue = queues[device];
+    while (queue.queue.length > 0) {
+      const { output, duration, startCallback, endCallback } = queue.queue[0];
+      queue.queue[0].status = 'running';
+      startCallback(device, output);
+      await sleep(duration);
+      if (queue.queue[0]?.output === output) {
+        endCallback(device, output);
+        queue.shift();
+        io.emit('message', { device, output, status: 'done' });
+      }
+    }
+    delete queues[device];
   }
 }
 
 module.exports = {
   queues,
-  initQueue,
-  countDown,
-  unqueue,
+  Queue,
+  Consumer,
 }
