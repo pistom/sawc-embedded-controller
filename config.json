@@ -46,11 +46,12 @@
         },
         "14": {
           "pin": 0
+        },
+        "pump": {
+          "pin": 7
         }
       },
-      "input": {
-        "pin": 7
-      }
+      "inputs": {}
     },
     "MODULE_02": {
       "name": "Module 2",
@@ -98,11 +99,12 @@
         },
         "14": {
           "pin": 0
+        },
+        "pump": {
+          "pin": 7
         }
       },
-      "input": {
-        "pin": 7
-      }
+      "inputs": {}
     }
   }
 }

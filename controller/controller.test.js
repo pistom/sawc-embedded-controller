@@ -30,12 +30,12 @@ describe('stopWater', () => {
 });
 
 describe('Consumer', () => {
-  test.only('consumes queue', async () => {
+  test('consumes queue', async () => {
     await jest.useFakeTimers();
     const queues = {};
-    const message1 = { device: 'MODULE_01', output: '1', duration: 1 };
-    const message2 = { device: 'MODULE_01', output: '2', duration: 1 };
-    const message3 = { device: 'MODULE_01', output: '3', duration: 1 };
+    const message1 = { device: 'MODULE_01', output: '1', duration: 5 };
+    const message2 = { device: 'MODULE_01', output: '2', duration: 5 };
+    const message3 = { device: 'MODULE_01', output: '3', duration: 5 };
     const io = {
       emit: jest.fn((msg, data) => console.log(data))
     };
@@ -51,5 +51,6 @@ describe('Consumer', () => {
     expect(queues['MODULE_01'].queue.length).toBe(1);
     await jest.runAllTimers();
     expect(queues['MODULE_01']).toBeUndefined();
+    await jest.runAllTimers();
   });
 });

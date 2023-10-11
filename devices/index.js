@@ -1,5 +1,5 @@
 const devices = {}
 
 module.exports = {
-	devices
+  devices
 }

@@ -12,3 +12,8 @@
  * @property {Array} queue
  * @property {Consumer} consumer
  */
+
+/**
+ * @typedef {Object} Device
+ * 
+ */

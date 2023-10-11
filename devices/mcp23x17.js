@@ -50,7 +50,26 @@ const initOutput = async (device, output) => {
   }
 }
 
+const initInput = async (device) => {
+  if (!devices[device]) {
+    await initDevice(device);
+  }
+
+  if (!devices[device].inputs) {
+    devices[device].inputs = {};
+    for (const input in config.devices[device].inputs) {
+      devices[device].inputs[input] = await devices[device]
+        .mcp
+        .mode(
+          config.devices[device].inputs[input].pin,
+          MODE_INPUT
+        );
+    }
+  }
+}
+
 module.exports = {
   initDevice,
   initOutput,
+  initInput,
 }

@@ -17,6 +17,16 @@ const setPinToLow = async (device, output) => {
   await devices[device].outputs[output].write(0);
 }
 
+const startPump = async (device) => {
+  if (!devices[device]?.outputs['pump']) {
+    await initOutput(device, 'pump');
+  }
+  devices[device].outputs['pump'].write(1);
+}
+const stopPump = async (device) => {
+  devices[device].outputs['pump'].write(0);
+}
+
 /**
  * 
  * @param {Object.<string, Queue>} queues 
@@ -26,13 +36,14 @@ const setPinToLow = async (device, output) => {
 const startWater = async (queues, message, io) => {
   const { device, output, duration } = message;
   if (!queues[device]) {
+    await startPump(device);
     queues[device] = new Queue(device);
   }
   const queue = queues[device];
   queue.add(output, duration, setPinToHigh, setPinToLow);
   if (!queue.consumer) {
     queue.consumer = new Consumer(queues, device, io);
-    queue.consumer.consume();
+    queue.consumer.consume(stopPump);
   }
 }
 
@@ -52,8 +63,9 @@ const stopWater = async (queues, message, io) => {
     const queueElement = queues[device].unqueue(output);
     // Check if the output is in the queue
     if (queueElement) {
-      // Checki if the output is currently on
+      // Checki if the output is currently set to on
       if (queueElement.status === 'running') {
+        queueElement.sleep.abort();
         queueElement.endCallback(device, output);
         messageContent.status = 'stopped';
       } else {
@@ -62,6 +74,9 @@ const stopWater = async (queues, message, io) => {
     } else {
       messageContent.status = 'error';
       messageContent.message = 'No queue element for output';
+    }
+    if (queues[device].queue.length === 0) {
+      stopPump(device);
     }
     io.emit('message', messageContent);
   }
