@@ -34,7 +34,7 @@ body {
   width: 40px;
   position: absolute;
   top: 120.5px;
-  left: 370.5px;
+  left: 720.5px;
   line-height: 0;
 }
 .mcp23017_module {
@@ -46,10 +46,10 @@ body {
   height: 1142px;
 }
 #MODULE_01 {
-  left: 359px;
+  left: 249px;
 }
 #MODULE_02 {
-  left: 959px;
+  left: 849px;
 }
 .pin, .module_pin {
   display: inline-block;
@@ -235,36 +235,58 @@ body {
 .module_output.output_high {
   background-color: transparent;
   animation: none;
-  box-shadow: #88c0d0 0 0 0 5px;
+  box-shadow: rgba(136, 192, 208, .5) 0 0 0 5px;
 }
 .module_output.output_high span {
   font-size: 26px;
   position: absolute;
   overflow: hidden;
-  right: -50px;
+  right: -30px;
   top: 10px;
   display: block;
-  width: 40px;
+  width: 30px;
   height: 20px;
   color: #88c0d0;
   line-height: 1rem;
+  border: none;
 }
 .module_output.output_high span::after {
-  content: "➡➡➡";
+  content: "";
+  background-size: contain;
+  
+  background-position: center;
+  background-image: url('../images/drop.svg');
   display: block;
   position: absolute;
+  height: 20px;
+  width: 60px;
   animation: slideRightOut 1s infinite linear;
 }
 .module_output.output_high:nth-child(n+9) span {
-  left: -50px;
+  left: -30px;
 }
 .module_output.output_high:nth-child(n+9) span::after {
-  content: "⬅⬅⬅";
   animation: slideLeftOut 1s infinite linear;
 }
 .module_output.output_high.relay_output_A7 span::after {
-  content: "⬅⬅⬅";
   animation: slideRightIn 1s infinite linear;
+}
+.module_output:not(:nth-last-child(2))::after {
+  content: "";
+  position: absolute;
+  height: 40px;
+  width: 60px;
+  right: -70px;
+  background-image: url('../images/plant.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.module_output:nth-child(n+9):after {
+  left: -70px;
+}
+.module_output:nth-child(2)::after {
+  background-image: url('../images/bucket.svg');
 }
 
 @keyframes slideRightOut {
@@ -272,12 +294,12 @@ body {
     right: 0px;
   }
   100% {
-    right: -23px;
+    right: -20px;
   }
 }
 @keyframes slideLeftOut {
   0% {
-    right: -23px;
+    right: -20px;
   }
   100% {
     right: 0;
@@ -285,7 +307,7 @@ body {
 }
 @keyframes slideRightIn {
   0% {
-    right: -23px;
+    right: -20px;
   }
   100% {
     right: 0;
