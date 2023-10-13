@@ -1,5 +1,5 @@
 # Data
-rpi-emulator/state.json
+emulator/state.json
 # Dependency directories
 node_modules/
 # Optional npm cache directory

@@ -6,7 +6,7 @@ You can use it for watering plants systems.
 
 ### Devices connection diagram
 
-![Devices connection diagram](https://raw.githubusercontent.com/pistom/sawc-embedded-controller/main/rpi-emulator/images/diagram.svg)
+![Devices connection diagram](https://raw.githubusercontent.com/pistom/sawc-embedded-controller/main/emulator/images/diagram.svg)
 
 ## Emulator
 The app automatically detects whether it is running on the device and provides a web application to emulate devices behaviour during development.

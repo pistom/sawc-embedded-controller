@@ -5,7 +5,7 @@ let GPIO
 if (isPi()) {
   GPIO = require('onoff').Gpio;
 } else {
-  GPIO = require('../rpi-emulator/mock.js').Gpio;
+  GPIO = require('../emulator/mock.js').Gpio;
 }
 
 const initOutput = (gpioNumber, direction) => {

@@ -14,10 +14,9 @@ app.use(cors());
 const { queues } = require('./controller/queues');
 const { startWater, stopWater } = require('./controller/controller.js');
 const { setGpio } = require('./devices/gpio.js');
+const { getConfigFile } = require('./utils/filesUtils');
 
 io.on("connection", async (socket) => {
-  console.log("A user connected");
-
   socket.on("message",
     /**
      * @param {WaterMessage} message
@@ -31,17 +30,16 @@ io.on("connection", async (socket) => {
         case 'stopWater':
           await stopWater(queues, message, io);
           break;
-        default:
-          console.log('Unknown message action: ' + message.action);
       }
     });
 
   // Handle disconnection
-  socket.on("disconnect", () => {
-    console.log("A user disconnected");
-  });
+  socket.on("disconnect", () => {});
 });
 
+app.get('/config', (req, res) => {
+  res.json({ config: getConfigFile() });
+});
 
 app.get('/gpio/:number/:state', (req, res) => {
   setGpio(req.params.number, 'out', req.params.state === 'on' ? 1 : 0);

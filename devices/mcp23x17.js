@@ -17,7 +17,7 @@ const initDevice = async (device) => {
     bus = new i2c(1);
     mcp = new MCP23x17(bus, config.devices[device].address);
   } else {
-    MCP23x17 = require('../rpi-emulator/mock.js').MCP23x17;
+    MCP23x17 = require('../emulator/mock.js').MCP23x17;
     bus = null;
     mcp = new MCP23x17(device);
   }

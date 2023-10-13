@@ -1,5 +1,4 @@
 const fs = require('fs');
-const stateFile = './rpi-emulator/state.json';
 
 const createFileIfNotExists = fileName => {
   try {
@@ -17,8 +16,13 @@ const deleteFile = fileName => {
   fs.unlinkSync(fileName);
 }
 
+const getConfigFile = () => {
+  const file = fs.readFileSync('./config.json', 'utf8');
+  return JSON.parse(file);
+}
+
 module.exports = {
-  stateFile,
+  getConfigFile,
   emptyFile,
   createFileIfNotExists,
 };

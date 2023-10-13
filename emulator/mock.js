@@ -1,6 +1,7 @@
 const { MODE_OUTPUT } = require('@mrvanosh/mcp23x17');
 const fs = require('fs');
-const { createFileIfNotExists, stateFile } = require('./utils');
+const { createFileIfNotExists } = require('../utils/filesUtils');
+const stateFile = './emulator/state.json';
 
 function writeStatus(device, pin, status, dir) {
   createFileIfNotExists(stateFile);

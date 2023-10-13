@@ -37,10 +37,11 @@ const startWater = async (queues, message, io) => {
   const { device, output, duration } = message;
   if (!queues[device]) {
     await startPump(device);
-    queues[device] = new Queue(device);
+    queues[device] = new Queue(device, io);
   }
   const queue = queues[device];
   queue.add(output, duration, setPinToHigh, setPinToLow);
+  io.emit('message', {status: 'remainingTimes', device, remainingTimes: queue.getRemainingTimes()});
   if (!queue.consumer) {
     queue.consumer = new Consumer(queues, device, io);
     queue.consumer.consume(stopPump);
@@ -78,6 +79,7 @@ const stopWater = async (queues, message, io) => {
     if (queues[device].queue.length === 0) {
       stopPump(device);
     }
+    io.emit('message', {status: 'remainingTimes', device, remainingTimes: queues[device].getRemainingTimes()});
     io.emit('message', messageContent);
   }
 }
