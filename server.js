@@ -5,11 +5,11 @@ const isPi = require('detect-rpi');
 const { Server } = require("socket.io");
 const { WaterMessage } = require('./types');
 
+const port = 3001;
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
-const port = 3001;
-app.use(cors());
+const io = new Server(server, {cors: {origin: true}});
+app.use(cors({origin: true}));
 
 const { queues } = require('./controller/queues');
 const { startWater, stopWater } = require('./controller/controller.js');

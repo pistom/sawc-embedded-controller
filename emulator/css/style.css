@@ -253,7 +253,6 @@ body {
 .module_output.output_high span::after {
   content: "";
   background-size: contain;
-  
   background-position: center;
   background-image: url('../images/drop.svg');
   display: block;
@@ -281,6 +280,9 @@ body {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+}
+.module_output.output_high:not(:nth-last-child(2)):not(:nth-child(2))::after {
+  animation: pulse 1s ease-in-out infinite;
 }
 .module_output:nth-child(n+9):after {
   left: -70px;
@@ -313,8 +315,6 @@ body {
     right: 0;
   }
 }
-
-
 @keyframes blink {
   0% {
     opacity: 1;
@@ -324,5 +324,22 @@ body {
   }
   100% {
     opacity: 1;
+  }
+}
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.25);
+  }
+  50% {
+    transform: scale(.85);
+  }
+  75% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
   }
 }
