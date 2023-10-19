@@ -33,24 +33,26 @@ socket.onmessage = function(event) {
         if (outputElement) {
           outputElement.classList.remove('output_in','output_out');
           outputElement.classList.add(`output_${state[mcp23017Module][output][0]}`);
-          if (outputElement && state[mcp23017Module][output][1]) {
-            outputElement.classList.add("output_high");
-          } else {
+          if (outputElement && state[mcp23017Module][output][1] === 0) {
+            outputElement.classList.add("output_low");
             outputElement.classList.remove("output_high");
+          } else {
+            outputElement.classList.remove("output_low");
+            outputElement.classList.add("output_high");
           }
           relayElement.classList.remove('output_in','output_out');
           relayElement.classList.add(`output_${state[mcp23017Module][output][0]}`);
-          if (relayElement && state[mcp23017Module][output][1]) {
-            relayElement.classList.add("output_high");
+          if (relayElement && state[mcp23017Module][output][1] === 0) {
+            relayElement.classList.add("output_low");
           } else {
-            relayElement.classList.remove("output_high");
+            relayElement.classList.remove("output_low");
           }
           relayOutput.classList.remove('output_in','output_out');
           relayOutput.classList.add(`output_${state[mcp23017Module][output][0]}`);
-          if (relayOutput && state[mcp23017Module][output][1]) {
-            relayOutput.classList.add("output_high");
+          if (relayOutput && state[mcp23017Module][output][1] === 0) {
+            relayOutput.classList.add("output_low");
           } else {
-            relayOutput.classList.remove("output_high");
+            relayOutput.classList.remove("output_low");
           }
         }
       }

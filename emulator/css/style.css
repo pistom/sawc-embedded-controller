@@ -226,18 +226,23 @@ body {
 .gpio_high, .output_high  {
 	background-color: #83ad5f;
   box-shadow: #83ad5f 0 0 0 3px;
-  animation: blink .3s infinite;
+  animation: blink .25s infinite;
 }
-.gpio_high.gpio_in, .output_high.output_in {
+.output_low  {
+	background-color: #4695f5;
+  box-shadow: #5e81ac 0 0 0 3px;
+  animation: blink 1s infinite;
+}
+.gpio_high.gpio_in, .output_low.output_in {
 	background-color: #bf616a;
   box-shadow: #bf616a 0 0 0 3px;
 }
-.module_output.output_high {
+.module_output.output_low {
   background-color: transparent;
   animation: none;
   box-shadow: rgba(136, 192, 208, .5) 0 0 0 5px;
 }
-.module_output.output_high span {
+.module_output.output_low span {
   font-size: 26px;
   position: absolute;
   overflow: hidden;
@@ -250,7 +255,7 @@ body {
   line-height: 1rem;
   border: none;
 }
-.module_output.output_high span::after {
+.module_output.output_low span::after {
   content: "";
   background-size: contain;
   background-position: center;
@@ -261,13 +266,13 @@ body {
   width: 60px;
   animation: slideRightOut 1s infinite linear;
 }
-.module_output.output_high:nth-child(n+9) span {
+.module_output.output_low:nth-child(n+9) span {
   left: -30px;
 }
-.module_output.output_high:nth-child(n+9) span::after {
+.module_output.output_low:nth-child(n+9) span::after {
   animation: slideLeftOut 1s infinite linear;
 }
-.module_output.output_high.relay_output_A7 span::after {
+.module_output.output_low.relay_output_A7 span::after {
   animation: slideRightIn 1s infinite linear;
 }
 .module_output:not(:nth-last-child(2))::after {
@@ -281,8 +286,8 @@ body {
   background-repeat: no-repeat;
   background-position: center;
 }
-.module_output.output_high:not(:nth-last-child(2)):not(:nth-child(2))::after {
-  animation: pulse 1s ease-in-out infinite;
+.module_output.output_low:not(:nth-last-child(2)):not(:nth-child(2))::after {
+  animation: pulse 2s ease-in-out infinite;
 }
 .module_output:nth-child(n+9):after {
   left: -70px;
@@ -320,7 +325,7 @@ body {
     opacity: 1;
   }
   50% {
-    opacity: 0.85;
+    opacity: 0.75;
   }
   100% {
     opacity: 1;
@@ -330,14 +335,17 @@ body {
   0% {
     transform: scale(1);
   }
-  25% {
+  12% {
     transform: scale(1.25);
   }
-  50% {
+  24% {
     transform: scale(.85);
   }
-  75% {
+  36% {
     transform: scale(1.15);
+  }
+  48% {
+    transform: scale(1);
   }
   100% {
     transform: scale(1);

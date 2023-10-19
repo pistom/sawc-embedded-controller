@@ -1,4 +1,4 @@
-const { i2c, MODE_OUTPUT, OUTPUT_LOW } = require('@mrvanosh/mcp23x17');
+const { i2c, MODE_OUTPUT, OUTPUT_LOW, OUTPUT_HIGH } = require('@mrvanosh/mcp23x17');
 const config = require('../config');
 const isPi = require('detect-rpi');
 
@@ -45,7 +45,7 @@ const initOutput = async (device, output) => {
       .mode(
         config.devices[device].outputs[output].pin,
         MODE_OUTPUT,
-        OUTPUT_LOW
+        OUTPUT_HIGH
       );
   }
 }
@@ -67,6 +67,8 @@ const initInput = async (device) => {
     }
   }
 }
+
+
 
 module.exports = {
   initDevice,
