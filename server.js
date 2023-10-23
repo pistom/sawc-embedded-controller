@@ -12,7 +12,7 @@ const io = new Server(server, {cors: {origin: true}});
 app.use(cors({origin: true}));
 
 const { queues } = require('./controller/queues');
-const { startWater, stopWater } = require('./controller/controller.js');
+const { startWater, stopWater, getRemainingTimes } = require('./controller/controller.js');
 const { setGpio } = require('./devices/gpio.js');
 const { getConfigFile } = require('./utils/filesUtils');
 
@@ -29,6 +29,9 @@ io.on("connection", async (socket) => {
           break;
         case 'stopWater':
           await stopWater(queues, message, io);
+          break;
+        case 'getRemainingTimes':
+          getRemainingTimes(queues, message.device, io);
           break;
       }
     });

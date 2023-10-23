@@ -1,6 +1,6 @@
 /**
  * @typedef {Object} WaterMessage
- * @property {'startWater'|'stopWater'} action
+ * @property {'startWater'|'stopWater|getRemainingTimes'} action
  * @property {string} device
  * @property {string} output
  * @property {number} [duration]

@@ -41,7 +41,7 @@ const startWater = async (queues, message, io) => {
   }
   const queue = queues[device];
   queue.add(output, duration, setPinToLow, setPinToHigh);
-  io.emit('message', {status: 'remainingTimes', device, remainingTimes: queue.getRemainingTimes()});
+  io.emit('message', { status: 'remainingTimes', device, remainingTimes: queue.getRemainingTimes() });
   if (!queue.consumer) {
     queue.consumer = new Consumer(queues, device, io);
     queue.consumer.consume(stopPump);
@@ -56,7 +56,7 @@ const startWater = async (queues, message, io) => {
  */
 const stopWater = async (queues, message, io) => {
   const { device, output } = message;
-  const messageContent = {device, output, status: '', message: ''};
+  const messageContent = { device, output, status: '', message: '' };
   if (!queues[device]) {
     messageContent.status = 'error';
     messageContent.message = 'No queue for device';
@@ -79,12 +79,24 @@ const stopWater = async (queues, message, io) => {
     if (queues[device].queue.length === 0) {
       stopPump(device);
     }
-    io.emit('message', {status: 'remainingTimes', device, remainingTimes: queues[device].getRemainingTimes()});
+    io.emit('message', { status: 'remainingTimes', device, remainingTimes: queues[device].getRemainingTimes() });
     io.emit('message', messageContent);
   }
+}
+
+const getRemainingTimes = (queues, device, io) => {
+  if (!queues[device]) {
+    return {};
+  }
+  io.emit('message', {
+    status: 'remainingTimes',
+    device: device,
+    remainingTimes: queues[device].getRemainingTimes()
+  });
 }
 
 module.exports = {
   startWater,
   stopWater,
+  getRemainingTimes,
 }
