@@ -1,5 +1,6 @@
 const { sleep } = require('../utils/sleep');
-const { QueueType } = require('../types')
+const { QueueType } = require('../types');
+const { convertToDuration } = require('../utils/convertToDuartion');
 
 /**
  * @type {Object.<string, QueueType>}
@@ -29,13 +30,14 @@ class Queue {
       outputs[item.output] = {
         wateringIn: parseFloat((globalTime - item.duration - elapsedTime).toFixed(2)),
         wateringTime: item.duration,
+        wateringVolume: item.volume,
       };
     }
     return outputs;
   }
 
-  add(output, duration, startCallback, endCallback) {
-    this.queue.push({ output, duration, startCallback, endCallback });
+  add(output, volume, startCallback, endCallback) {
+    this.queue.push({ output, duration: convertToDuration(volume), volume, startCallback, endCallback });
   }
 
   unqueue(output) {

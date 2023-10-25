@@ -6,49 +6,65 @@
       "address": 39,
       "outputs": {
         "pump": {
-          "pin": 15 
+          "pin": 7 
         },
         "1": {
-          "pin": 8
+          "pin": 8,
+          "image": "01.jpg"
         },
         "2": {
-          "pin": 6
+          "pin": 6,
+          "image": "02.jpg"
         },
         "3": {
-          "pin": 9
+          "pin": 9,
+          "image": "03.jpg"
         },
         "4": {
-          "pin": 5
+          "pin": 5,
+          "image": "04.jpg"
         },
         "5": {
-          "pin": 10
+          "pin": 10,
+          "image": "05.jpg"
         },
         "6": {
-          "pin": 4
+          "pin": 4,
+          "image": "06.jpg"
         },
         "7": {
-          "pin": 11
+          "pin": 11,
+          "image": "07.jpg"
         },
         "8": {
-          "pin": 3
+          "pin": 3,
+          "image": "01.jpg"
         },
         "9": {
-          "pin": 12
+          "pin": 12,
+          "image": "01.jpg"
         },
         "10": {
-          "pin": 2
+          "pin": 2,
+          "image": "01.jpg"
         },
         "11": {
-          "pin": 13
+          "pin": 13,
+          "image": "01.jpg"
         },
         "12": {
-          "pin": 1
+          "pin": 1,
+          "image": "01.jpg"
         },
         "13": {
-          "pin": 14
+          "name": "Dracena",
+          "pin": 14,
+          "image": "01.jpg"
         },
         "14": {
-          "pin": 0
+          "name": "Monstera",
+          "pin": 0,
+          "image": "01.jpg"
         }
       },
       "inputs": {}

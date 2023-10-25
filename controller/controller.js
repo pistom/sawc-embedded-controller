@@ -34,13 +34,13 @@ const stopPump = async (device) => {
  * @param {import('socket.io').Server} io 
  */
 const startWater = async (queues, message, io) => {
-  const { device, output, duration } = message;
+  const { device, output, volume } = message;
   if (!queues[device]) {
     await startPump(device);
     queues[device] = new Queue(device, io);
   }
   const queue = queues[device];
-  queue.add(output, duration, setPinToLow, setPinToHigh);
+  queue.add(output, volume, setPinToLow, setPinToHigh);
   io.emit('message', { status: 'remainingTimes', device, remainingTimes: queue.getRemainingTimes() });
   if (!queue.consumer) {
     queue.consumer = new Consumer(queues, device, io);

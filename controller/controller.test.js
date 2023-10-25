@@ -6,7 +6,7 @@ describe('startWater', () => {
   test('adds output to queue and starts consumer if not running', async () => {
     jest.useFakeTimers();
     const queues = {};
-    const message = { device: 'MODULE_01', output: '1', duration: 10 };
+    const message = { device: 'MODULE_01', output: '1', volume: 10 };
     const io = null;
     await startWater(queues, message, io);
     expect(queues['MODULE_01']).toBeInstanceOf(Queue);
@@ -17,8 +17,8 @@ describe('startWater', () => {
 describe('stopWater', () => {
   test('stops output if running', async () => {
     const queues = {};
-    const message1 = { device: 'MODULE_01', output: '1', duration: 10 };
-    const message2 = { device: 'MODULE_01', output: '2', duration: 10 };
+    const message1 = { device: 'MODULE_01', output: '1', volume: 10 };
+    const message2 = { device: 'MODULE_01', output: '2', volume: 10 };
     const io = {
       emit: jest.fn()
     };
@@ -33,9 +33,9 @@ describe('Consumer', () => {
   test('consumes queue', async () => {
     await jest.useFakeTimers();
     const queues = {};
-    const message1 = { device: 'MODULE_01', output: '1', duration: 5 };
-    const message2 = { device: 'MODULE_01', output: '2', duration: 5 };
-    const message3 = { device: 'MODULE_01', output: '3', duration: 5 };
+    const message1 = { device: 'MODULE_01', output: '1', volume: 5 };
+    const message2 = { device: 'MODULE_01', output: '2', volume: 5 };
+    const message3 = { device: 'MODULE_01', output: '3', volume: 5 };
     const io = {
       emit: jest.fn((msg, data) => console.log(data))
     };

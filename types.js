@@ -3,7 +3,7 @@
  * @property {'startWater'|'stopWater|getRemainingTimes'} action
  * @property {string} device
  * @property {string} output
- * @property {number} [duration]
+ * @property {number} [volume]
  */
 
 /**
