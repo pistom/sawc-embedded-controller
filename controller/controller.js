@@ -1,4 +1,5 @@
 const { initOutput } = require('../devices/mcp23x17');
+const { saveConfigFile, getConfigFile } = require('../utils/filesUtils');
 const { Queue, Consumer } = require('./queues');
 
 const devices = require('../devices').devices;
@@ -95,8 +96,20 @@ const getRemainingTimes = (queues, device, io) => {
   });
 }
 
+const editOutput = (message, io) => {
+  const { device, output, name, image, defaultVolume } = message;
+  const config = getConfigFile();
+  config.devices[device].outputs[output].name = name;
+  config.devices[device].outputs[output].image = image;
+  config.devices[device].outputs[output].defaultVolume = defaultVolume;
+  saveConfigFile(config);
+  io.emit('message', { status: 'configEdited', config})
+}
+
+
 module.exports = {
   startWater,
   stopWater,
   getRemainingTimes,
+  editOutput,
 }

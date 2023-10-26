@@ -21,8 +21,13 @@ const getConfigFile = () => {
   return JSON.parse(file);
 }
 
+const saveConfigFile = config => {
+  fs.writeFileSync('./config.json', JSON.stringify(config));
+}
+
 module.exports = {
   getConfigFile,
+  saveConfigFile,
   emptyFile,
   createFileIfNotExists,
 };
