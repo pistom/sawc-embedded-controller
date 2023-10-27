@@ -11,6 +11,7 @@ const server = http.createServer(app);
 const io = new Server(server, {cors: {origin: true}});
 app.use(cors({origin: true}));
 
+require('./config.js').getConfig();
 const { queues } = require('./controller/queues');
 const { startWater, stopWater, getRemainingTimes, editOutput } = require('./controller/controller.js');
 const { setGpio } = require('./devices/gpio.js');

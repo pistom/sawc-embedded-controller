@@ -17,14 +17,11 @@ const initOutput = (gpioNumber, direction) => {
 
 const setGpio = (gpioNumber, direction, state) => {
   if (!devices.GPIO) {
-    console.log('initOutput');
     initOutput(gpioNumber, direction);
   } else if (devices.GPIO[gpioNumber]?.direction !== direction) {
-    console.log('unexport')
     devices.GPIO[gpioNumber].unexport();
     initOutput(gpioNumber, direction);
   }
-  console.log(direction, state)
   devices.GPIO[gpioNumber].writeSync(state);
 }
 

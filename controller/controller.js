@@ -103,6 +103,7 @@ const editOutput = (message, io) => {
   config.devices[device].outputs[output].image = image;
   config.devices[device].outputs[output].defaultVolume = defaultVolume;
   saveConfigFile(config);
+  require('../config.js').getConfig();
   io.emit('message', { status: 'configEdited', config})
 }
 

@@ -1,7 +1,6 @@
 const { sleep } = require('../utils/sleep');
 const { QueueType } = require('../types');
-const { convertToDuration } = require('../utils/convertToDuartion');
-
+const { config } = require('../config');
 /**
  * @type {Object.<string, QueueType>}
  */
@@ -36,8 +35,24 @@ class Queue {
     return outputs;
   }
 
+  convertToDuration(output, volume) {
+    if (volume > config.devices[this.device].settings.maxVolumePerOutput) {
+      volume = config.devices[this.device].settings.maxVolumePerOutput;
+    }
+    const outputRatio = 
+      config.devices[this.device].outputs[output].ratio || 
+      config.devices[this.device].settings.defaultRatio;
+    return volume * outputRatio;
+  }
+
   add(output, volume, startCallback, endCallback) {
-    this.queue.push({ output, duration: convertToDuration(volume), volume, startCallback, endCallback });
+    this.queue.push({ 
+      output, 
+      duration: this.convertToDuration(output, volume), 
+      volume, 
+      startCallback, 
+      endCallback 
+    });
   }
 
   unqueue(output) {

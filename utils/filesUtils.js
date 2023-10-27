@@ -1,4 +1,5 @@
 const fs = require('fs');
+const yaml = require('js-yaml');
 
 const createFileIfNotExists = fileName => {
   try {
@@ -17,12 +18,16 @@ const deleteFile = fileName => {
 }
 
 const getConfigFile = () => {
-  const file = fs.readFileSync('./config.json', 'utf8');
-  return JSON.parse(file);
+  let fileName = './config.yml';
+  if (!fs.existsSync('./config.yml')) {
+    fileName = './config.default.yml';
+  }
+  const file = fs.readFileSync(fileName, 'utf8');
+  return yaml.load(file);
 }
 
 const saveConfigFile = config => {
-  fs.writeFileSync('./config.json', JSON.stringify(config));
+  fs.writeFileSync('./config.yml', yaml.dump(config));
 }
 
 module.exports = {

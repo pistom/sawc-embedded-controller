@@ -1,5 +1,5 @@
 const { i2c, MODE_OUTPUT, OUTPUT_LOW, OUTPUT_HIGH } = require('@mrvanosh/mcp23x17');
-const config = require('../config');
+const { config } = require('../config');
 const isPi = require('detect-rpi');
 
 const devices = require('../devices').devices;
