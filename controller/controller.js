@@ -114,6 +114,18 @@ const editOutput = (message, io) => {
   io.emit('message', { status: 'configEdited', config})
 }
 
+const editDevice = (message, io) => {
+  const { device, name, defaultVolume, defaultRatio, maxVolumePerOutput, calibrateDuration } = message;
+  const config = getConfigFile();
+  name ? (config.devices[device].name = name) : (config.devices[device].name = device);
+  defaultRatio ? (config.devices[device].settings.defaultRatio = defaultRatio) : delete config.devices[device].settings.defaultRatio;
+  defaultVolume ? (config.devices[device].settings.defaultVolume = defaultVolume) : delete config.devices[device].settings.defaultVolume;
+  maxVolumePerOutput ? (config.devices[device].settings.maxVolumePerOutput = maxVolumePerOutput) : delete config.devices[device].settings.maxVolumePerOutput;
+  calibrateDuration ? (config.devices[device].settings.calibrateDuration = calibrateDuration) : delete config.devices[device].settings.calibrateDuration;
+  saveConfigFile(config);
+  require('../config.js').getConfig();
+  io.emit('message', { status: 'configEdited', config})
+}
 
 const calibrate = async (queues, message, io) => {
   const { device, output } = message;
@@ -162,6 +174,7 @@ module.exports = {
   stopWater,
   getRemainingTimes,
   editOutput,
+  editDevice,
   calibrate,
   stopCalibrating,
   calculateRatio,
