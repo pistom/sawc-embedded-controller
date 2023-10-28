@@ -7,6 +7,7 @@ devices:
       defaultVolume: 50            # Default volume of water par output
       defaultRatio: 2              # Mililiters per second
       maxVolumePerOutput: 1000     # Max volume of water per output
+      calibrateDuration: 60        # Duration of calibration in seconds
     type: MCP23017
     address: 39                    # I2C address of the device
     outputs:

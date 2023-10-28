@@ -1,8 +1,11 @@
 const { initOutput } = require('../devices/mcp23x17');
 const { saveConfigFile, getConfigFile } = require('../utils/filesUtils');
+const { sleep } = require('../utils/sleep');
 const { Queue, Consumer } = require('./queues');
 
 const devices = require('../devices').devices;
+let isCalibrating = false ;
+let calibrateSleep = null;
 
 const setPinToHigh = async (device, output) => {
   if (!devices[device]?.outputs[output]) {
@@ -35,6 +38,9 @@ const stopPump = async (device) => {
  * @param {import('socket.io').Server} io 
  */
 const startWater = async (queues, message, io) => {
+  if (isCalibrating) {
+    io.emit('message', { status: 'calibratingError', device: message.device, output: message.output, message: 'Cannot start water while calibrating' });
+  }
   const { device, output, volume } = message;
   if (!queues[device]) {
     await startPump(device);
@@ -97,20 +103,66 @@ const getRemainingTimes = (queues, device, io) => {
 }
 
 const editOutput = (message, io) => {
-  const { device, output, name, image, defaultVolume } = message;
+  const { device, output, name, image, defaultVolume, ratio } = message;
   const config = getConfigFile();
-  config.devices[device].outputs[output].name = name;
-  config.devices[device].outputs[output].image = image;
-  config.devices[device].outputs[output].defaultVolume = defaultVolume;
+  name ? (config.devices[device].outputs[output].name = name) : delete config.devices[device].outputs[output].name;
+  image ? (config.devices[device].outputs[output].image = image) : delete config.devices[device].outputs[output].image;
+  defaultVolume ? (config.devices[device].outputs[output].defaultVolume = defaultVolume) : delete config.devices[device].outputs[output].defaultVolume;
+  ratio ? (config.devices[device].outputs[output].ratio = ratio) : delete config.devices[device].outputs[output].ratio;
   saveConfigFile(config);
   require('../config.js').getConfig();
   io.emit('message', { status: 'configEdited', config})
 }
 
 
+const calibrate = async (queues, message, io) => {
+  const { device, output } = message;
+  const duration = require('../config').config.devices[device].settings.calibrateDuration;
+  calibrateSleep = sleep(duration);
+  if (isCalibrating) {
+    io.emit('message', { status: 'calibratingError', device, output, message: 'Already calibrating' });
+    return;
+  }
+  if (queues[device]?.queue.length > 0) {
+    io.emit('message', { status: 'calibratingError', device, output, message: 'Cannot calibrate while queue is running' });
+    return;
+  }
+  isCalibrating = true;
+  await startPump(device);
+  await setPinToLow(device, output);
+  io.emit('message', { status: 'calibratingWaterStarted', duration, device, output });
+  await calibrateSleep.promise
+  await stopPump(device);
+  if (isCalibrating) {
+    await setPinToHigh(device, output);
+    io.emit('message', { status: 'calibratingWaterStopped', duration, device, output });
+    isCalibrating = false;
+  }
+}
+
+const stopCalibrating = async (message, io) => {
+  const { device, output } = message;
+  if (isCalibrating) {
+    calibrateSleep.abort();
+    await setPinToHigh(device, output);
+    io.emit('message', { status: 'calibratingWaterAborted', device, output });
+    isCalibrating = false;
+  }
+}
+
+const calculateRatio = (message, io) => {
+  const { device, output, volume } = message;
+  const duration = require('../config').config.devices[device].settings.calibrateDuration;
+  const ratio = Number((volume / duration).toFixed(2));
+  io.emit('message', { status: 'ratioCalculated', ratio, device, output });
+}
+
 module.exports = {
   startWater,
   stopWater,
   getRemainingTimes,
   editOutput,
+  calibrate,
+  stopCalibrating,
+  calculateRatio,
 }

@@ -42,7 +42,7 @@ class Queue {
     const outputRatio = 
       config.devices[this.device].outputs[output].ratio || 
       config.devices[this.device].settings.defaultRatio;
-    return volume * outputRatio;
+    return Number((volume / outputRatio).toFixed(0));
   }
 
   add(output, volume, startCallback, endCallback) {

@@ -13,7 +13,7 @@ app.use(cors({origin: true}));
 
 require('./config.js').getConfig();
 const { queues } = require('./controller/queues');
-const { startWater, stopWater, getRemainingTimes, editOutput } = require('./controller/controller.js');
+const { startWater, stopWater, getRemainingTimes, editOutput, calibrate, stopCalibrating, calculateRatio } = require('./controller/controller.js');
 const { setGpio } = require('./devices/gpio.js');
 const { getConfigFile } = require('./utils/filesUtils');
 
@@ -36,6 +36,15 @@ io.on("connection", async (socket) => {
           break;
         case 'editOutput':
           editOutput(message, io);
+          break;
+        case 'calibrate':
+          calibrate(queues, message, io);
+          break;
+        case 'stopCalibrating':
+          stopCalibrating(message, io);
+          break;
+        case 'calculateRatio':
+          calculateRatio(message, io);
           break;
       }
     });
