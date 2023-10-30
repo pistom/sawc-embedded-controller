@@ -23,13 +23,13 @@ Restart=on-failure \n\
 \n\
 [Install] \n\
 WantedBy=multi-user.target"
-echo -e "$content" > "/etc/systemd/system/sawc-$name.service"
+echo -e "$content" | sudo tee "/etc/systemd/system/sawc-$name.service" > /dev/null
 done
 
-systemctl daemon-reload
+sudo systemctl daemon-reload
 
 for name in "${names[@]}"
 do
-systemctl enable sawc-$name.service
-systemctl start sawc-$name.service
+sudo systemctl enable sawc-$name.service
+sudo systemctl start sawc-$name.service
 done

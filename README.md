@@ -33,6 +33,6 @@ to start the server on your Raspberry Pi
 
 To run the applications on Raspberry startup (Linux), execute the `install.sh` script
 ```bash
-sudo ./install.sh
+./install.sh
 ```
 The script will add new services to systemd service manager
