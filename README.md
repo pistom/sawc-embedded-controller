@@ -28,3 +28,11 @@ Run
 node server.js
 ```
 to start the server on your Raspberry Pi 
+
+## Production
+
+To run the applications on Raspberry startup (Linux), execute the `install.sh` script
+```bash
+sudo ./install.sh
+```
+The script will add new services to systemd service manager
