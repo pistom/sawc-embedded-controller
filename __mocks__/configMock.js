@@ -4,6 +4,7 @@ const configMock = {
       settings: {
         maxVolumePerOutput: 10,
         defaultRatio: .85,
+        calibrateDuration: 10,
       },
       outputs: {
         '1': {

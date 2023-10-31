@@ -1,13 +1,10 @@
-const { initOutput } = require('../devices/mcp23x17');
 const { saveConfigFile, getConfigFile } = require('../utils/filesUtils');
 const { sleep } = require('../utils/sleep');
 const { outputOn, outputOff } = require('./inputOutput');
 const { startPump, stopPump } = require('./pump');
 const { Queue, Consumer } = require('./queues');
 
-const devices = require('../devices').devices;
-let isCalibrating = false ;
-let calibrateSleep = null;
+const calibrating = require('./calibrating');
 
 /**
  * 
@@ -16,8 +13,10 @@ let calibrateSleep = null;
  * @param {import('socket.io').Server} io 
  */
 const startWater = async (queues, message, io) => {
-  if (isCalibrating) {
+  const calibrating = require('./calibrating');
+  if (calibrating.isCalibrating) {
     io.emit('message', { status: 'calibratingError', device: message.device, output: message.output, message: 'Cannot start water while calibrating' });
+    return;
   }
   const { device, output, volume } = message;
   if (!queues[device]) {
@@ -116,10 +115,11 @@ const editDeviceOutput = (message, io) => {
 }
 
 const calibrate = async (queues, message, io) => {
+  const calibrating = require('./calibrating');
   const { device, output } = message;
   const duration = require('../config').config.devices[device].settings.calibrateDuration;
-  calibrateSleep = sleep(duration);
-  if (isCalibrating) {
+  calibrating.calibrateSleep = sleep(duration);
+  if (calibrating.isCalibrating) {
     io.emit('message', { status: 'calibratingError', device, output, message: 'Already calibrating' });
     return;
   }
@@ -127,26 +127,27 @@ const calibrate = async (queues, message, io) => {
     io.emit('message', { status: 'calibratingError', device, output, message: 'Cannot calibrate while queue is running' });
     return;
   }
-  isCalibrating = true;
+  calibrating.isCalibrating = true;
   await startPump(device);
-  await setPinToLow(device, output);
+  await outputOn(device, output);
   io.emit('message', { status: 'calibratingWaterStarted', duration, device, output });
-  await calibrateSleep.promise
+  await calibrating.calibrateSleep.promise
   await stopPump(device);
-  if (isCalibrating) {
-    await setPinToHigh(device, output);
+  if (calibrating.isCalibrating) {
+    await outputOff(device, output);
     io.emit('message', { status: 'calibratingWaterStopped', duration, device, output });
-    isCalibrating = false;
+    calibrating.isCalibrating = false;
   }
 }
 
 const stopCalibrating = async (message, io) => {
+  const calibrating = require('./calibrating');
   const { device, output } = message;
-  if (isCalibrating) {
-    calibrateSleep.abort();
-    await setPinToHigh(device, output);
+  if (calibrating.isCalibrating) {
+    calibrating.calibrateSleep.abort();
+    await outputOff(device, output);
     io.emit('message', { status: 'calibratingWaterAborted', device, output });
-    isCalibrating = false;
+    calibrating.isCalibrating = false;
   }
 }
 
