@@ -22,12 +22,14 @@ const setPinToLow = async (device, output) => {
 }
 
 const startPump = async (device) => {
+  if (require('../config').config.devices[device].outputs['pump'].disabled) return;
   if (!devices[device]?.outputs['pump']) {
     await initOutput(device, 'pump');
   }
   devices[device].outputs['pump'].write(0);
 }
 const stopPump = async (device) => {
+  if (require('../config').config.devices[device].outputs['pump'].disabled) return;
   devices[device].outputs['pump'].write(1);
 }
 
@@ -127,6 +129,16 @@ const editDevice = (message, io) => {
   io.emit('message', { status: 'configEdited', config})
 }
 
+const editDeviceOutput = (message, io) => {
+  const { device, output, pin, disabled } = message;
+  const config = getConfigFile();
+  disabled !== undefined && (config.devices[device].outputs[output].disabled = disabled);
+  pin >= 0 && (config.devices[device].outputs[output].pin = pin);
+  saveConfigFile(config);
+  require('../config.js').getConfig();
+  io.emit('message', { status: 'configOutputEdited', config, device, output})
+}
+
 const calibrate = async (queues, message, io) => {
   const { device, output } = message;
   const duration = require('../config').config.devices[device].settings.calibrateDuration;
@@ -175,6 +187,7 @@ module.exports = {
   getRemainingTimes,
   editOutput,
   editDevice,
+  editDeviceOutput,
   calibrate,
   stopCalibrating,
   calculateRatio,
