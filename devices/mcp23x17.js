@@ -38,12 +38,12 @@ const initOutput = async (device, output) => {
   if (!devices[device]) {
     await initDevice(device);
   }
-
+  const pin = require('../config').config.devices[device].outputs[output].pin
   if (!devices[device].outputs[output]) {
     devices[device].outputs[output] = await devices[device]
       .mcp
       .mode(
-        config.devices[device].outputs[output].pin,
+        pin,
         MODE_OUTPUT,
         OUTPUT_HIGH
       );

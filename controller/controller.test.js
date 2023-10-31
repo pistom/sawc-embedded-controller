@@ -1,15 +1,27 @@
 const { startWater, stopWater } = require('./controller');
 const { Queue, Consumer } = require('./queues');
 
+const ioMock = require('../__mocks__/ioMock');
+const { configMock } = require('../__mocks__/configMock');
+
+beforeAll(() => {
+  jest.useFakeTimers();
+  jest.mock('../config');
+  require('../config').config = configMock;
+});
+
+afterAll(() => {
+  jest.clearAllTimers();
+  jest.resetAllMocks();
+});
 
 describe('startWater', () => {
   test('adds output to queue and starts consumer if not running', async () => {
-    jest.useFakeTimers();
     const queues = {};
     const message = { device: 'MODULE_01', output: '1', volume: 10 };
-    const io = null;
-    await startWater(queues, message, io);
+    await startWater(queues, message, ioMock);
     expect(queues['MODULE_01']).toBeInstanceOf(Queue);
+    expect(queues['MODULE_01'].queue[0].duration).toBe(20);
     expect(queues['MODULE_01'].consumer).toBeInstanceOf(Consumer);
   });
 });
@@ -19,29 +31,22 @@ describe('stopWater', () => {
     const queues = {};
     const message1 = { device: 'MODULE_01', output: '1', volume: 10 };
     const message2 = { device: 'MODULE_01', output: '2', volume: 10 };
-    const io = {
-      emit: jest.fn()
-    };
-    await startWater(queues, message1, io);
-    await startWater(queues, message2, io);
-    await stopWater(queues, message1, io);
+    await startWater(queues, message1, ioMock);
+    await startWater(queues, message2, ioMock);
+    await stopWater(queues, message1, ioMock);
     expect(queues['MODULE_01'].queue.length).toBe(1);
   });
 });
 
 describe('Consumer', () => {
   test('consumes queue', async () => {
-    await jest.useFakeTimers();
     const queues = {};
     const message1 = { device: 'MODULE_01', output: '1', volume: 5 };
     const message2 = { device: 'MODULE_01', output: '2', volume: 5 };
     const message3 = { device: 'MODULE_01', output: '3', volume: 5 };
-    const io = {
-      emit: jest.fn((msg, data) => console.log(data))
-    };
-    await startWater(queues, message1, io);
-    await startWater(queues, message2, io);
-    await startWater(queues, message3, io);
+    await startWater(queues, message1, ioMock);
+    await startWater(queues, message2, ioMock);
+    await startWater(queues, message3, ioMock);
     expect(queues['MODULE_01'].queue.length).toBe(3);
     expect(queues['MODULE_01'].consumer).toBeInstanceOf(Consumer);
     expect(queues['MODULE_01'].queue[0].status).toBe('running');

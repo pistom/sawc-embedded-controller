@@ -1,37 +1,13 @@
 const { initOutput } = require('../devices/mcp23x17');
 const { saveConfigFile, getConfigFile } = require('../utils/filesUtils');
 const { sleep } = require('../utils/sleep');
+const { outputOn, outputOff } = require('./inputOutput');
+const { startPump, stopPump } = require('./pump');
 const { Queue, Consumer } = require('./queues');
 
 const devices = require('../devices').devices;
 let isCalibrating = false ;
 let calibrateSleep = null;
-
-const setPinToHigh = async (device, output) => {
-  if (!devices[device]?.outputs[output]) {
-    await initOutput(device, output);
-  }
-  devices[device].outputs[output].write(1);
-}
-
-const setPinToLow = async (device, output) => {
-  if (!devices[device]?.outputs[output]) {
-    await initOutput(device, output);
-  }
-  await devices[device].outputs[output].write(0);
-}
-
-const startPump = async (device) => {
-  if (require('../config').config.devices[device].outputs['pump'].disabled) return;
-  if (!devices[device]?.outputs['pump']) {
-    await initOutput(device, 'pump');
-  }
-  devices[device].outputs['pump'].write(0);
-}
-const stopPump = async (device) => {
-  if (require('../config').config.devices[device].outputs['pump'].disabled) return;
-  devices[device].outputs['pump'].write(1);
-}
 
 /**
  * 
@@ -49,7 +25,7 @@ const startWater = async (queues, message, io) => {
     queues[device] = new Queue(device, io);
   }
   const queue = queues[device];
-  queue.add(output, volume, setPinToLow, setPinToHigh);
+  queue.add(output, volume, outputOn, outputOff);
   io.emit('message', { status: 'remainingTimes', device, remainingTimes: queue.getRemainingTimes() });
   if (!queue.consumer) {
     queue.consumer = new Consumer(queues, device, io);

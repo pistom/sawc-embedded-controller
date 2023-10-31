@@ -7,7 +7,7 @@
     "start": "supervisor server.js",
     "emulator": "node emulator/watcher.js & http-server emulator/ -p 3030 -o",
     "dev": "npm start & npm run emulator",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "author": "",
   "license": "ISC",

@@ -36,12 +36,11 @@ class Queue {
   }
 
   convertToDuration(output, volume) {
-    if (volume > config.devices[this.device].settings.maxVolumePerOutput) {
-      volume = config.devices[this.device].settings.maxVolumePerOutput;
+    const device = require('../config').config.devices[this.device]
+    if (volume > device.settings.maxVolumePerOutput) {
+      volume = device.settings.maxVolumePerOutput;
     }
-    const outputRatio = 
-      config.devices[this.device].outputs[output].ratio || 
-      config.devices[this.device].settings.defaultRatio;
+    const outputRatio = device.outputs[output].ratio || device.settings.defaultRatio;
     return Number((volume / outputRatio).toFixed(0));
   }
 
