@@ -1,0 +1,27 @@
+name: Jest test
+
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: yarn install
+      - run: yarn test:badges
+      - name: Upload coverage badge
+        run: yarn test:badges:upload
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ vars.GIST_ID }}
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: coverage-badge
+          path: coverage/badge-statements.svg
+          retention-days: 1

@@ -1,15 +1,15 @@
 const { initOutput } = require('../devices/mcp23x17');
 
-const devices = require('../devices').devices;
-
 const outputOff = async (device, output) => {
+  const devices = require('../devices').devices;
   if (!devices[device]?.outputs[output]) {
     await initOutput(device, output);
   }
-  devices[device].outputs[output].write(1);
+  await devices[device].outputs[output].write(1);
 }
 
 const outputOn = async (device, output) => {
+  const devices = require('../devices').devices;
   if (!devices[device]?.outputs[output]) {
     await initOutput(device, output);
   }

@@ -1,8 +1,7 @@
 const { initOutput } = require('../devices/mcp23x17');
 
-const devices = require('../devices').devices;
-
 const startPump = async (device) => {
+  const devices = require('../devices').devices;
   if (require('../config').config.devices[device].outputs['pump'].disabled) return;
   if (!devices[device]?.outputs['pump']) {
     await initOutput(device, 'pump');
@@ -11,6 +10,7 @@ const startPump = async (device) => {
 }
 
 const stopPump = async (device) => {
+  const devices = require('../devices').devices;
   if (require('../config').config.devices[device].outputs['pump'].disabled) return;
   devices[device].outputs['pump'].write(1);
 }

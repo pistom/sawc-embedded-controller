@@ -2,13 +2,13 @@ const { i2c, MODE_OUTPUT, OUTPUT_LOW, OUTPUT_HIGH } = require('@mrvanosh/mcp23x1
 const { config } = require('../config');
 const isPi = require('detect-rpi');
 
-const devices = require('../devices').devices;
 
 /**
  * 
  * @param {string} device 
  */
 const initDevice = async (device) => {
+  const devices = require('../devices').devices;
   let MCP23x17;
   let bus;
   let mcp;
@@ -35,6 +35,7 @@ const initDevice = async (device) => {
  * @param {string} output 
  */
 const initOutput = async (device, output) => {
+  const devices = require('../devices').devices;
   if (!devices[device]) {
     await initDevice(device);
   }
@@ -51,6 +52,7 @@ const initOutput = async (device, output) => {
 }
 
 const initInput = async (device) => {
+  const devices = require('../devices').devices;
   if (!devices[device]) {
     await initDevice(device);
   }

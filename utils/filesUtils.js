@@ -18,6 +18,7 @@ const deleteFile = fileName => {
 }
 
 const getConfigFile = () => {
+
   let fileName = './config.yml';
   if (!fs.existsSync('./config.yml')) {
     fileName = './config.default.yml';
@@ -35,4 +36,5 @@ module.exports = {
   saveConfigFile,
   emptyFile,
   createFileIfNotExists,
+  deleteFile,
 };

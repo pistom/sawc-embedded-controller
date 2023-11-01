@@ -1,3 +1,4 @@
+[![Test](https://github.com/pistom/sawc-embedded-controller/actions/workflows/test.yml/badge.svg)](https://github.com/pistom/sawc-embedded-controller/actions/workflows/test.yml)
 # Smart Automatic Watering Conroller
 
 This is a Raspberry Pi Node.js application that provide websocket server to manage pumps and water solenoid valves.

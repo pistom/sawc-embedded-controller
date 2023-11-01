@@ -64,52 +64,54 @@ const stopWater = async (queues, message, io) => {
       stopPump(device);
     }
     io.emit('message', { status: 'remainingTimes', device, remainingTimes: queues[device].getRemainingTimes() });
-    io.emit('message', messageContent);
   }
+  io.emit('message', messageContent);
 }
 
 const getRemainingTimes = (queues, device, io) => {
   if (!queues[device]) {
     return {};
   }
+  const remainingTimes = queues[device].getRemainingTimes()
   io.emit('message', {
     status: 'remainingTimes',
     device: device,
-    remainingTimes: queues[device].getRemainingTimes()
+    remainingTimes
   });
+  return remainingTimes;
 }
 
 const editOutput = (message, io) => {
   const { device, output, name, image, defaultVolume, ratio } = message;
-  const config = getConfigFile();
+  const config = require('../utils/filesUtils').getConfigFile();
   name ? (config.devices[device].outputs[output].name = name) : delete config.devices[device].outputs[output].name;
   image ? (config.devices[device].outputs[output].image = image) : delete config.devices[device].outputs[output].image;
   defaultVolume ? (config.devices[device].outputs[output].defaultVolume = defaultVolume) : delete config.devices[device].outputs[output].defaultVolume;
   ratio ? (config.devices[device].outputs[output].ratio = ratio) : delete config.devices[device].outputs[output].ratio;
-  saveConfigFile(config);
+  require('../utils/filesUtils').saveConfigFile(config);
   require('../config.js').getConfig();
   io.emit('message', { status: 'configEdited', config})
 }
 
 const editDevice = (message, io) => {
   const { device, name, defaultVolume, defaultRatio, maxVolumePerOutput, calibrateDuration } = message;
-  const config = getConfigFile();
+  const config = require('../utils/filesUtils').getConfigFile();
   name ? (config.devices[device].name = name) : (config.devices[device].name = device);
   defaultRatio ? (config.devices[device].settings.defaultRatio = defaultRatio) : delete config.devices[device].settings.defaultRatio;
   defaultVolume ? (config.devices[device].settings.defaultVolume = defaultVolume) : delete config.devices[device].settings.defaultVolume;
   maxVolumePerOutput ? (config.devices[device].settings.maxVolumePerOutput = maxVolumePerOutput) : delete config.devices[device].settings.maxVolumePerOutput;
   calibrateDuration ? (config.devices[device].settings.calibrateDuration = calibrateDuration) : delete config.devices[device].settings.calibrateDuration;
-  saveConfigFile(config);
+  require('../utils/filesUtils').saveConfigFile(config);
   require('../config.js').getConfig();
   io.emit('message', { status: 'configEdited', config})
 }
 
 const editDeviceOutput = (message, io) => {
   const { device, output, pin, disabled } = message;
-  const config = getConfigFile();
+  const config = require('../utils/filesUtils').getConfigFile();
   disabled !== undefined && (config.devices[device].outputs[output].disabled = disabled);
   pin >= 0 && (config.devices[device].outputs[output].pin = pin);
-  saveConfigFile(config);
+  require('../utils/filesUtils').saveConfigFile(config);
   require('../config.js').getConfig();
   io.emit('message', { status: 'configOutputEdited', config, device, output})
 }
@@ -145,6 +147,7 @@ const stopCalibrating = async (message, io) => {
   const { device, output } = message;
   if (calibrating.isCalibrating) {
     calibrating.calibrateSleep.abort();
+    await stopPump(device);
     await outputOff(device, output);
     io.emit('message', { status: 'calibratingWaterAborted', device, output });
     calibrating.isCalibrating = false;
@@ -156,6 +159,7 @@ const calculateRatio = (message, io) => {
   const duration = require('../config').config.devices[device].settings.calibrateDuration;
   const ratio = Number((volume / duration).toFixed(2));
   io.emit('message', { status: 'ratioCalculated', ratio, device, output });
+  return ratio;
 }
 
 module.exports = {
