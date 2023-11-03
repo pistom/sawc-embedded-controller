@@ -1,11 +1,11 @@
 const { sleep } = require('../utils/sleep');
 const { QueueType } = require('../types');
-const { config } = require('../config');
-/**
- * @type {Object.<string, QueueType>}
- */
+
 const queues = {};
 
+/**
+ * @type {QueueType}
+ */
 class Queue {
   constructor(device, io) {
     this.queue = [];
@@ -86,12 +86,15 @@ class Consumer {
       queue.queue[0].sleep = sleep(duration);
       await queue.queue[0].sleep.promise;
       if (queue.queue[0]?.output === output) {
-        endCallback(device, output);
+        const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
+        setTimeout(async () => {
+          await endCallback(device, output);
+        }, delayOff);
         queue.shift();
         io.emit('message', { device, output, status: 'done' });
       }
     }
-    finishCallback(device);
+    await finishCallback(device);
     delete queues[device];
   }
 }

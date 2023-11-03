@@ -1,4 +1,3 @@
-const { saveConfigFile, getConfigFile } = require('../utils/filesUtils');
 const { sleep } = require('../utils/sleep');
 const { outputOn, outputOff } = require('./inputOutput');
 const { startPump, stopPump } = require('./pump');
@@ -51,7 +50,9 @@ const stopWater = async (queues, message, io) => {
       // Checki if the output is currently set to on
       if (queueElement.status === 'running') {
         queueElement.sleep.abort();
-        queueElement.endCallback(device, output);
+        setTimeout(async () => {
+          queueElement.endCallback(device, output);
+        }, 500);
         messageContent.status = 'stopped';
       } else {
         messageContent.status = 'aborted';
