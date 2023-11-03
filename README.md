@@ -1,9 +1,9 @@
 [![Test](https://github.com/pistom/sawc-embedded-controller/actions/workflows/test.yml/badge.svg)](https://github.com/pistom/sawc-embedded-controller/actions/workflows/test.yml)
 
-[![Coverage Statements](https://raw.githubusercontent.com/gist/pistom/365dc9c90edfe42bb84f579461e23a6e/raw/6185012cd70ee2bec260182ccd18c38564d87d5f/badge-statements.svg)](https://github.com/pistom/sawc-embedded-controller/actions)
-[![Coverage Branches](https://raw.githubusercontent.com/gist/pistom/365dc9c90edfe42bb84f579461e23a6e/raw/6185012cd70ee2bec260182ccd18c38564d87d5f/badge-branches.svg)](https://github.com/pistom/sawc-embedded-controller/actions)
-[![Coverage Functions](https://raw.githubusercontent.com/gist/pistom/365dc9c90edfe42bb84f579461e23a6e/raw/6185012cd70ee2bec260182ccd18c38564d87d5f/badge-functions.svg)](https://github.com/pistom/sawc-embedded-controller/actions)
-[![Coverage Lines](https://raw.githubusercontent.com/gist/pistom/365dc9c90edfe42bb84f579461e23a6e/raw/6185012cd70ee2bec260182ccd18c38564d87d5f/badge-lines.svg)](https://github.com/pistom/sawc-embedded-controller/actions)
+[![Coverage Statements](https://gist.githubusercontent.com/pistom/365dc9c90edfe42bb84f579461e23a6e/raw/d9b001d3ade0a06f395fc1cec273a2be9efeab3e/badge-statements.svg)](https://github.com/pistom/sawc-embedded-controller/actions)
+[![Coverage Branches](https://gist.githubusercontent.com/pistom/365dc9c90edfe42bb84f579461e23a6e/raw/d9b001d3ade0a06f395fc1cec273a2be9efeab3e/badge-branches.svg)](https://github.com/pistom/sawc-embedded-controller/actions)
+[![Coverage Functions](https://gist.githubusercontent.com/pistom/365dc9c90edfe42bb84f579461e23a6e/raw/d9b001d3ade0a06f395fc1cec273a2be9efeab3e/badge-functions.svg)](https://github.com/pistom/sawc-embedded-controller/actions)
+[![Coverage Lines](https://gist.githubusercontent.com/pistom/365dc9c90edfe42bb84f579461e23a6e/raw/d9b001d3ade0a06f395fc1cec273a2be9efeab3e/badge-lines.svg)](https://github.com/pistom/sawc-embedded-controller/actions)
 
 # Smart Automatic Watering Conroller
 
