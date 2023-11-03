@@ -147,6 +147,7 @@ describe('Consumer', () => {
     await jest.runAllTimers();
     expect(queues['MODULE_01'].queue.length).toBe(1);
     await jest.runAllTimers();
+    await jest.runAllTimers();
     expect(queues['MODULE_01']).toBeUndefined();
     await jest.runAllTimers();
   });

@@ -41,4 +41,6 @@ devices:
         pin: 0
       pump:
         pin: 7
+        delayOn: 200              # Delay between opening valve and switching on the pump
+        delayOff: 500             # Delay between switching off the pump and closing valve
     inputs: {}

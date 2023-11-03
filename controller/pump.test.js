@@ -33,7 +33,12 @@ describe('pump', () => {
   });
 
   it('should start pump', async () => {
+    jest.useFakeTimers();
+    const delay = 200;
+    configMock.devices['MODULE_01'].outputs['pump'].delayOn = delay;
     await startPump('MODULE_01');
+    expect(devicesMock['MODULE_01'].outputs['pump'].write).not.toHaveBeenCalled();
+    await jest.advanceTimersByTime(delay);
     expect(devicesMock['MODULE_01'].outputs['pump'].write).toHaveBeenCalledWith(0);
   });
 
