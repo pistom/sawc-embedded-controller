@@ -24,7 +24,7 @@ to start the server and emulator.
 ### Emulator
 If the application is not running on Raspberry Pi, the server automatically saves the state of inputs/outputs in `emulator/state.json` file. A webpage is available at `http://localhost:3030` displaying a diagram and the status of individual outputs.
 
-![SAWC Emulator](https://gist.github.com/pistom/976790556d4271fd1cca119c9fe11d92/raw/dd8a73a713445f0e408a419521a457c2aa05eaea/sawc01.gif)
+![SAWC Emulator](https://gist.githubusercontent.com/pistom/976790556d4271fd1cca119c9fe11d92/raw/ef35d7ffd139d9bf8d0629d7e8e9f49c4b051a1a/sawc03.gif)
 
 ## Production (Raspberry PI)
 
