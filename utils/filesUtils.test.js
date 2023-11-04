@@ -74,4 +74,29 @@ describe('filesUtils', () => {
     expect(yaml.dump).toHaveBeenCalledWith('test');
     expect(fs.writeFileSync).toHaveBeenCalledWith('./config.yml', 'test');
   });
+
+  it('gets schedule file', async () => {
+    const fs = require('fs');
+    const yaml = require('js-yaml');
+    yaml.load = jest.fn().mockImplementation(() => 'test');
+    fs.existsSync = jest.fn().mockImplementation(() => true);
+    fs.readFileSync = jest.fn().mockImplementation(() => 'test');
+    const { getScheduleFile } = require('./filesUtils');
+    const schedule = getScheduleFile();
+    expect(fs.existsSync).toHaveBeenCalledWith('./schedule.yml');
+    expect(yaml.load).toHaveBeenCalledWith('test');
+    expect(schedule).toEqual('test');
+  });
+  
+  it('returns empty schedule file', async () => {
+    const fs = require('fs');
+    const yaml = require('js-yaml');
+    yaml.load = jest.fn().mockImplementation(() => 'test');
+    fs.existsSync = jest.fn().mockImplementation(() => false);
+    fs.readFileSync = jest.fn().mockImplementation(() => 'test');
+    const { getScheduleFile } = require('./filesUtils');
+    const schedule = getScheduleFile();
+    expect(fs.existsSync).toHaveBeenCalledWith('./schedule.yml');
+    expect(schedule).toEqual({});
+  });
 });

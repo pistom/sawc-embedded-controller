@@ -15,7 +15,7 @@ require('./config.js').getConfig();
 const { queues } = require('./controller/queues');
 const { startWater, stopWater, getRemainingTimes, editOutput, calibrate, stopCalibrating, calculateRatio, editDevice, editDeviceOutput } = require('./controller/controller.js');
 const { setGpio } = require('./devices/gpio.js');
-const { getConfigFile } = require('./utils/filesUtils');
+const { getConfigFile, getScheduleFile } = require('./utils/filesUtils');
 
 io.on("connection", async (socket) => {
   socket.on("message",
@@ -61,6 +61,10 @@ io.on("connection", async (socket) => {
 
 app.get('/config', (req, res) => {
   res.json({ config: getConfigFile() });
+});
+
+app.get('/schedule', (req, res) => {
+  res.json(getScheduleFile());
 });
 
 app.get('/gpio/:number/:state', (req, res) => {

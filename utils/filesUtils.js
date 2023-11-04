@@ -27,12 +27,23 @@ const getConfigFile = () => {
   return yaml.load(file);
 }
 
+const getScheduleFile = () => {
+
+  let fileName = './schedule.yml';
+  if (!fs.existsSync('./schedule.yml')) {
+    return {};
+  }
+  const file = fs.readFileSync(fileName, 'utf8');
+  return yaml.load(file);
+}
+
 const saveConfigFile = config => {
   fs.writeFileSync('./config.yml', yaml.dump(config));
 }
 
 module.exports = {
   getConfigFile,
+  getScheduleFile,
   saveConfigFile,
   emptyFile,
   createFileIfNotExists,
