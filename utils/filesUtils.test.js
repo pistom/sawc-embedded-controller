@@ -97,6 +97,6 @@ describe('filesUtils', () => {
     const { getScheduleFile } = require('./filesUtils');
     const schedule = getScheduleFile();
     expect(fs.existsSync).toHaveBeenCalledWith('./schedule.yml');
-    expect(schedule).toEqual({});
+    expect(schedule).toEqual({"events": []});
   });
 });

@@ -31,10 +31,14 @@ const getScheduleFile = () => {
 
   let fileName = './schedule.yml';
   if (!fs.existsSync('./schedule.yml')) {
-    return {};
+    return {events: []};
   }
   const file = fs.readFileSync(fileName, 'utf8');
   return yaml.load(file);
+}
+
+const saveScheduleFile = schedule => {
+  fs.writeFileSync('./schedule.yml', yaml.dump(schedule));
 }
 
 const saveConfigFile = config => {
@@ -48,4 +52,5 @@ module.exports = {
   emptyFile,
   createFileIfNotExists,
   deleteFile,
+  saveScheduleFile,
 };

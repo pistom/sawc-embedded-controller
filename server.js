@@ -10,12 +10,15 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {cors: {origin: true}});
 app.use(cors({origin: true}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 require('./config.js').getConfig();
 const { queues } = require('./controller/queues');
 const { startWater, stopWater, getRemainingTimes, editOutput, calibrate, stopCalibrating, calculateRatio, editDevice, editDeviceOutput } = require('./controller/controller.js');
 const { setGpio } = require('./devices/gpio.js');
-const { getConfigFile, getScheduleFile } = require('./utils/filesUtils');
+const { getConfigFile, getScheduleFile, saveScheduleFile } = require('./utils/filesUtils');
+const { saveScheduleEvent, getDataForAlwaysTypeEvent, getDataForPeriodTypeEvent, getDataForOnceTypeEvent } = require('./controller/schedule.js');
 
 io.on("connection", async (socket) => {
   socket.on("message",
@@ -65,6 +68,21 @@ app.get('/config', (req, res) => {
 
 app.get('/schedule', (req, res) => {
   res.json(getScheduleFile());
+});
+
+app.post('/schedule', (req, res) => {
+  const eventData = req.body;
+  res.json(saveScheduleEvent(eventData, 'add'));
+});
+
+app.put('/schedule', (req, res) => {
+  const eventData = req.body;
+  res.json(saveScheduleEvent(eventData, 'edit'));
+});
+
+app.delete('/schedule/:id', (req, res) => {
+  const eventData = { id: req.params.id };
+  res.json(saveScheduleEvent(eventData, 'delete'));
 });
 
 app.get('/gpio/:number/:state', (req, res) => {
