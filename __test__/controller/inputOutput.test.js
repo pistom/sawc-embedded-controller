@@ -1,10 +1,10 @@
-const { devicesMock } = require('../__mocks__/devicesMock');
-const { configMock } = require('../__mocks__/configMock');
-const { outputOn, outputOff } = require('./inputOutput');
+const { devicesMock } = require('../../__mocks__/devicesMock');
+const { configMock } = require('../../__mocks__/configMock');
+const { outputOn, outputOff } = require('../../controller/inputOutput');
 
 beforeEach(async() => {
-  jest.mock('../emulator/mock');
-  require('../emulator/mock').MCP23x17 = jest.fn().mockImplementation(() => {
+  jest.mock('../../emulator/mock');
+  require('../../emulator/mock').MCP23x17 = jest.fn().mockImplementation(() => {
     return {
       begin: function () {
         return new Promise((resolve, reject) => {
@@ -26,10 +26,10 @@ beforeEach(async() => {
 describe('inputOutput', () => {
   beforeEach(async() => {
     jest.clearAllMocks();
-    jest.mock('../devices');
-    require('../devices').devices = devicesMock;
-    jest.mock('../config');
-    require('../config').config = configMock;
+    jest.mock('../../devices');
+    require('../../devices').devices = devicesMock;
+    jest.mock('../../config');
+    require('../../config').config = configMock;
     delete devicesMock['MODULE_01'];
   });
 

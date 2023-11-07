@@ -8,7 +8,7 @@
     "emulator": "node emulator/watcher.js & http-server emulator/ -p 3030 -o",
     "dev": "npm start & npm run emulator",
     "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test:coverage": "jest --detectOpenHandles --coverage",
     "test:badges": "yarn run test:coverage && jest-coverage-badges",
     "test:badges:upload": "node scripts/upload-coverage-badge.js"
   },
@@ -27,13 +27,16 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
     "supervisor": "^0.12.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "jest-coverage-badges": "^1.1.2"
+    "jest-coverage-badges": "^1.1.2",
+    "supertest": "^6.3.3"
   },
   "jest": {
+    "testEnvironment": "node",
     "coverageReporters": [
       "json-summary",
       "text",

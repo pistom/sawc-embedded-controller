@@ -16,7 +16,7 @@ describe('filesUtils', () => {
       throw new Error('Sync error');
     });
     fs.writeFileSync = jest.fn();
-    const { createFileIfNotExists } = require('./filesUtils');
+    const { createFileIfNotExists } = require('../../utils/filesUtils');
     createFileIfNotExists('test.txt');
     expect(fs.writeFileSync).toHaveBeenCalledWith('test.txt', '{}');
   });
@@ -24,7 +24,7 @@ describe('filesUtils', () => {
   it('empties file', async () => {
     const fs = require('fs');
     fs.writeFileSync = jest.fn();
-    const { emptyFile } = require('./filesUtils');
+    const { emptyFile } = require('../../utils/filesUtils');
     emptyFile('test.txt');
     expect(fs.writeFileSync).toHaveBeenCalledWith('test.txt', '{}');
   });
@@ -32,7 +32,7 @@ describe('filesUtils', () => {
   it('deletes file', async () => {
     const fs = require('fs');
     fs.unlinkSync = jest.fn();
-    const { deleteFile } = require('./filesUtils');
+    const { deleteFile } = require('../../utils/filesUtils');
     deleteFile('test.txt');
     expect(fs.unlinkSync).toHaveBeenCalledWith('test.txt');
   });
@@ -43,7 +43,7 @@ describe('filesUtils', () => {
     yaml.load = jest.fn().mockImplementation(() => 'test');
     fs.existsSync = jest.fn().mockImplementation(() => true);
     fs.readFileSync = jest.fn().mockImplementation(() => 'test');
-    const { getConfigFile } = require('./filesUtils');
+    const { getConfigFile } = require('../../utils/filesUtils');
     const config = getConfigFile();
     expect(fs.existsSync).toHaveBeenCalledWith('./config.yml');
     expect(yaml.load).toHaveBeenCalledWith('test');
@@ -56,7 +56,7 @@ describe('filesUtils', () => {
     yaml.load = jest.fn().mockImplementation(() => 'test');
     fs.existsSync = jest.fn().mockImplementation(() => false);
     fs.readFileSync = jest.fn().mockImplementation(() => 'test');
-    const { getConfigFile } = require('./filesUtils');
+    const { getConfigFile } = require('../../utils/filesUtils');
     const config = getConfigFile();
     expect(fs.existsSync).toHaveBeenCalledWith('./config.yml');
     expect(fs.readFileSync).toHaveBeenCalledWith('./config.default.yml', 'utf8');
@@ -69,7 +69,7 @@ describe('filesUtils', () => {
     const yaml = require('js-yaml');
     yaml.dump = jest.fn().mockImplementation(() => 'test');
     fs.writeFileSync = jest.fn();
-    const { saveConfigFile } = require('./filesUtils');
+    const { saveConfigFile } = require('../../utils/filesUtils');
     saveConfigFile('test');
     expect(yaml.dump).toHaveBeenCalledWith('test');
     expect(fs.writeFileSync).toHaveBeenCalledWith('./config.yml', 'test');
@@ -81,7 +81,7 @@ describe('filesUtils', () => {
     yaml.load = jest.fn().mockImplementation(() => 'test');
     fs.existsSync = jest.fn().mockImplementation(() => true);
     fs.readFileSync = jest.fn().mockImplementation(() => 'test');
-    const { getScheduleFile } = require('./filesUtils');
+    const { getScheduleFile } = require('../../utils/filesUtils');
     const schedule = getScheduleFile();
     expect(fs.existsSync).toHaveBeenCalledWith('./schedule.yml');
     expect(yaml.load).toHaveBeenCalledWith('test');
@@ -94,9 +94,20 @@ describe('filesUtils', () => {
     yaml.load = jest.fn().mockImplementation(() => 'test');
     fs.existsSync = jest.fn().mockImplementation(() => false);
     fs.readFileSync = jest.fn().mockImplementation(() => 'test');
-    const { getScheduleFile } = require('./filesUtils');
+    const { getScheduleFile } = require('../../utils/filesUtils');
     const schedule = getScheduleFile();
     expect(fs.existsSync).toHaveBeenCalledWith('./schedule.yml');
     expect(schedule).toEqual({"events": []});
+  });
+
+  it('saves schedule file', async () => {
+    const fs = require('fs');
+    const yaml = require('js-yaml');
+    yaml.dump = jest.fn().mockImplementation(() => 'test');
+    fs.writeFileSync = jest.fn();
+    const { saveScheduleFile } = require('../../utils/filesUtils');
+    saveScheduleFile('test');
+    expect(yaml.dump).toHaveBeenCalledWith('test');
+    expect(fs.writeFileSync).toHaveBeenCalledWith('./schedule.yml', 'test');
   });
 });

@@ -5,7 +5,7 @@ const isPi = require('detect-rpi');
 const { Server } = require("socket.io");
 const { WaterMessage } = require('./types');
 
-const port = 3001;
+const port = process.env.NODE_ENV === 'test' ? 3301 : 3001;
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {cors: {origin: true}});
@@ -15,81 +15,99 @@ app.use(express.urlencoded({ extended: true }));
 
 require('./config.js').getConfig();
 const { queues } = require('./controller/queues');
-const { startWater, stopWater, getRemainingTimes, editOutput, calibrate, stopCalibrating, calculateRatio, editDevice, editDeviceOutput } = require('./controller/controller.js');
-const { setGpio } = require('./devices/gpio.js');
-const { getConfigFile, getScheduleFile, saveScheduleFile } = require('./utils/filesUtils');
-const { saveScheduleEvent, getDataForAlwaysTypeEvent, getDataForPeriodTypeEvent, getDataForOnceTypeEvent } = require('./controller/schedule.js');
+const { getConfigFile, getScheduleFile } = require('./utils/filesUtils');
 
-io.on("connection", async (socket) => {
-  socket.on("message",
-    /**
-     * @param {WaterMessage} message
-     * @returns {Promise<void>}
-     */
-    async (message) => {
-      switch (message.action) {
-        case 'startWater':
-          await startWater(queues, message, io);
-          break;
-        case 'stopWater':
-          await stopWater(queues, message, io);
-          break;
-        case 'getRemainingTimes':
-          getRemainingTimes(queues, message.device, io);
-          break;
-        case 'editOutput':
-          editOutput(message, io);
-          break;
-        case 'editDevice':
-          editDevice(message, io);
-          break;
-        case 'editDeviceOutput':
-          editDeviceOutput(message, io);
-          break;
-        case 'calibrate':
-          calibrate(queues, message, io);
-          break;
-        case 'stopCalibrating':
-          stopCalibrating(message, io);
-          break;
-        case 'calculateRatio':
-          calculateRatio(message, io);
-          break;
-      }
-    });
+const initServer = async () => {
 
-  // Handle disconnection
-  socket.on("disconnect", () => {});
-});
+  io.on("connection", async (socket) => {
+    socket.on("message",
 
-app.get('/config', (req, res) => {
-  res.json({ config: getConfigFile() });
-});
+      /**
+       * @param {WaterMessage} message
+       * @param {function} cb
+       * @returns {Promise<void>}
+       */
+      async (message, cb) => {
+        switch (message.action) {
+          case 'startWater':
+            await require('./controller/controller').startWater(queues, message, io);
+            break;
+          case 'stopWater':
+            await require('./controller/controller').stopWater(queues, message, io);
+            break;
+          case 'getRemainingTimes':
+            require('./controller/controller').getRemainingTimes(queues, message.device, io);
+            break;
+          case 'editOutput':
+            require('./controller/controller').editOutput(message, io);
+            break;
+          case 'editDevice':
+            require('./controller/controller').editDevice(message, io);
+            break;
+          case 'editDeviceOutput':
+            require('./controller/controller').editDeviceOutput(message, io);
+            break;
+          case 'calibrate':
+            require('./controller/controller').calibrate(queues, message, io);
+            break;
+          case 'stopCalibrating':
+            require('./controller/controller').stopCalibrating(message, io);
+            break;
+          case 'calculateRatio':
+            require('./controller/controller').calculateRatio(message, io);
+            break;
+        }
+        cb && cb(message.action);
+      });
 
-app.get('/schedule', (req, res) => {
-  res.json(getScheduleFile());
-});
+    // Handle disconnection
+    socket.on("disconnect", () => {});
+  });
 
-app.post('/schedule', (req, res) => {
-  const eventData = req.body;
-  res.json(saveScheduleEvent(eventData, 'add'));
-});
+  app.get('/config', (req, res) => {
+    res.json({ config: getConfigFile() });
+  });
 
-app.put('/schedule', (req, res) => {
-  const eventData = req.body;
-  res.json(saveScheduleEvent(eventData, 'edit'));
-});
+  app.get('/schedule', (req, res) => {
+    res.json(getScheduleFile());
+  });
 
-app.delete('/schedule/:id', (req, res) => {
-  const eventData = { id: req.params.id };
-  res.json(saveScheduleEvent(eventData, 'delete'));
-});
+  app.post('/schedule', (req, res) => {
+    const eventData = req.body;
+    res.json(require('./controller/schedule').saveScheduleEvent(eventData, 'add'));
+  });
 
-app.get('/gpio/:number/:state', (req, res) => {
-  setGpio(req.params.number, 'out', req.params.state === 'on' ? 1 : 0);
-  res.json({ status: 'success' });
-});
+  app.put('/schedule', (req, res) => {
+    const eventData = req.body;
+    res.json(require('./controller/schedule').saveScheduleEvent(eventData, 'edit'));
+  });
 
-server.listen(port, () => {
-  console.log(`SAWC controller listening on port ${port} (${isPi() ? 'ON' : 'OFF'} a Raspberry Pi)`);
-})
+  app.delete('/schedule/:id', (req, res) => {
+    const eventData = { id: req.params.id };
+    res.json(require('./controller/schedule').saveScheduleEvent(eventData, 'delete'));
+  });
+
+  app.get('/gpio/:number/:state', (req, res) => {
+    require('./devices/gpio').setGpio(req.params.number, 'out', req.params.state === 'on' ? 1 : 0);
+    res.json({ status: 'success' });
+  });
+
+  return server;
+};
+
+const startServer = async () => {
+  (await initServer()).listen(port, () => {
+    console.log(`SAWC controller listening on port ${port} (${isPi() ? 'ON' : 'OFF'} a Raspberry Pi)`);
+  });
+};
+
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
+
+module.exports = {
+  app,
+  io,
+  initServer,
+  startServer,
+}

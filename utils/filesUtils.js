@@ -18,7 +18,7 @@ const deleteFile = fileName => {
 }
 
 const getConfigFile = () => {
-
+  const fs = require('fs');
   let fileName = './config.yml';
   if (!fs.existsSync('./config.yml')) {
     fileName = './config.default.yml';
@@ -28,7 +28,7 @@ const getConfigFile = () => {
 }
 
 const getScheduleFile = () => {
-
+  const fs = require('fs');
   let fileName = './schedule.yml';
   if (!fs.existsSync('./schedule.yml')) {
     return {events: []};

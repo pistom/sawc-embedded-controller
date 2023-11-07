@@ -1,12 +1,13 @@
 const { getScheduleFile, saveScheduleFile } = require("../utils/filesUtils");
 
 const getTimeStringFromDateTimeString = (dateTimeString) => {
+  if (/^([01]\d|2[0-3]):([0-5]\d)$/.test(dateTimeString)) return dateTimeString;
   const date = new Date(dateTimeString);
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
+  if (date.toString() === 'Invalid Date') return '00:00';
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
 }
-
 
 const getCommonData = (eventData) => {
   const watering = eventData.watering.map(watering => ({
@@ -83,7 +84,7 @@ const saveScheduleEvent = (eventData, action = 'add') => {
       break;
   }
 
-  const schedule = getScheduleFile();
+  const schedule = require('../utils/filesUtils').getScheduleFile();
   if (action === 'edit') {
     const eventIndex = schedule.events.findIndex(e => e.id === eventData.id);
     if (eventIndex > -1) {
@@ -100,7 +101,7 @@ const saveScheduleEvent = (eventData, action = 'add') => {
     event.id = getLastEventId(schedule) + 1;
     schedule.events.push(event);
   }
-  saveScheduleFile(schedule);
+  require('../utils/filesUtils').saveScheduleFile(schedule);
   return event;
 }
 
