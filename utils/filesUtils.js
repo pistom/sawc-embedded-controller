@@ -18,7 +18,7 @@ const deleteFile = fileName => {
 }
 
 const getConfigFile = () => {
-
+  const fs = require('fs');
   let fileName = './config.yml';
   if (!fs.existsSync('./config.yml')) {
     fileName = './config.default.yml';
@@ -27,14 +27,30 @@ const getConfigFile = () => {
   return yaml.load(file);
 }
 
+const getScheduleFile = () => {
+  const fs = require('fs');
+  let fileName = './schedule.yml';
+  if (!fs.existsSync('./schedule.yml')) {
+    return {events: []};
+  }
+  const file = fs.readFileSync(fileName, 'utf8');
+  return yaml.load(file);
+}
+
+const saveScheduleFile = schedule => {
+  fs.writeFileSync('./schedule.yml', yaml.dump(schedule));
+}
+
 const saveConfigFile = config => {
   fs.writeFileSync('./config.yml', yaml.dump(config));
 }
 
 module.exports = {
   getConfigFile,
+  getScheduleFile,
   saveConfigFile,
   emptyFile,
   createFileIfNotExists,
   deleteFile,
+  saveScheduleFile,
 };

@@ -1,13 +1,13 @@
-const { startWater, stopWater, calibrate, stopCalibrating, editOutput, editDevice, editDeviceOutput, calculateRatio, getRemainingTimes } = require('./controller');
-const { Queue, Consumer } = require('./queues');
-const { startPump, stopPump } = require('./pump');
-jest.mock('./pump');
-const { outputOn, outputOff } = require('./inputOutput');
-jest.mock('./inputOutput');
+const { startWater, stopWater, calibrate, stopCalibrating, editOutput, editDevice, editDeviceOutput, calculateRatio, getRemainingTimes } = require('../../controller/controller');
+const { Queue, Consumer } = require('../../controller/queues');
+const { startPump, stopPump } = require('../../controller/pump');
+jest.mock('../../controller/pump');
+const { outputOn, outputOff } = require('../../controller/inputOutput');
+jest.mock('../../controller/inputOutput');
 let ioMock;
 let queues = {};
-const { configMock } = require('../__mocks__/configMock');
-const { sleep } = require('../utils/sleep');
+const { configMock } = require('../../__mocks__/configMock');
+const { sleep } = require('../../utils/sleep');
 
 afterAll(() => {
   jest.resetAllMocks();
@@ -16,9 +16,9 @@ afterAll(() => {
 beforeEach(async() => {
   jest.clearAllMocks();
   jest.useFakeTimers();
-  jest.mock('../config');
-  require('../config').config = configMock;
-  ioMock = require('../__mocks__/ioMock');
+  jest.mock('../../config');
+  require('../../config').config = configMock;
+  ioMock = require('../../__mocks__/ioMock');
 });
 
 describe('startWater', () => {
@@ -32,7 +32,7 @@ describe('startWater', () => {
   });
 
   it('prevents watering if calibration is not done', async () => {
-    const calibratingModule = require('./calibrating');
+    const calibratingModule = require('../../controller/calibrating');
     calibratingModule.isCalibrating = true;
     queues = {};
     const message = { device: 'MODULE_01', output: '1', volume: 10 };
@@ -66,7 +66,7 @@ describe('calibrate', () => {
   it('should run pump and output for calibrateDuration time when calibrating', async () => {
     queues = {};
     const calibrateMessage = { device: 'MODULE_01', output: '1' };
-    ioMock = require('../__mocks__/ioMock');
+    ioMock = require('../../__mocks__/ioMock');
     calibrate(queues, calibrateMessage, ioMock);
     await jest.runAllTimers();
     expect(startPump).toHaveBeenCalledWith('MODULE_01');
@@ -78,9 +78,9 @@ describe('calibrate', () => {
   });
 
   it('should stop calibrating if calibrateDuration is aborted', async () => {
-    ioMock = require('../__mocks__/ioMock');
+    ioMock = require('../../__mocks__/ioMock');
     const calibrateMessage = { device: 'MODULE_01', output: '1' };
-    const calibratingModule = require('./calibrating');
+    const calibratingModule = require('../../controller/calibrating');
     calibratingModule.isCalibrating = true;
     calibratingModule.calibrateSleep = sleep(2);
     await stopCalibrating(calibrateMessage, ioMock);
@@ -90,9 +90,9 @@ describe('calibrate', () => {
   });
 
   it('should not calibrate if already calibrating', async () => {
-    ioMock = require('../__mocks__/ioMock');
+    ioMock = require('../../__mocks__/ioMock');
     const calibrateMessage = { device: 'MODULE_01', output: '1' };
-    const calibratingModule = require('./calibrating');
+    const calibratingModule = require('../../controller/calibrating');
     calibratingModule.isCalibrating = true;
     await calibrate(queues, calibrateMessage, ioMock);
     expect(ioMock.emit).toHaveBeenCalledWith('message', { status: 'calibratingError', device: 'MODULE_01', output: '1', message: 'Already calibrating' });
@@ -100,7 +100,7 @@ describe('calibrate', () => {
   });
 
   it('should not calibrate if queue is running', async () => {
-    ioMock = require('../__mocks__/ioMock');
+    ioMock = require('../../__mocks__/ioMock');
     const calibrateMessage = { device: 'MODULE_01', output: '1' };
     queues = {};
     await startWater(queues, calibrateMessage, ioMock);
@@ -117,7 +117,7 @@ describe('getRemainingTimes', () => {
     const message2 = { device: 'MODULE_01', output: '2', volume: 10 };
     await startWater(queues, message1, ioMock);
     await startWater(queues, message2, ioMock);
-    const fileUtils = require('../utils/filesUtils');
+    const fileUtils = require('../../utils/filesUtils');
     fileUtils.getConfigFile = jest.fn().mockImplementation(() => {
       return configMock;
     });
@@ -156,7 +156,7 @@ describe('Consumer', () => {
 describe('editOutput', () => {
   test('edits output', async () => {
     const message = { device: 'MODULE_01', output: '1', name: 'Test name', image: 'testimage.jpg', defaultVolume: 221, ratio: .5 };
-    const fileUtils = require('../utils/filesUtils');
+    const fileUtils = require('../../utils/filesUtils');
     fileUtils.getConfigFile = jest.fn().mockImplementation(() => {
       return configMock;
     });
@@ -174,7 +174,7 @@ describe('editOutput', () => {
 describe('editDevice', () => {
   test('edits device', async () => {
     const message = { device: 'MODULE_01', name: 'Test name', defaultVolume: 221, defaultRatio: .5, maxVolumePerOutput: 100, calibrateDuration: 10 };
-    const fileUtils = require('../utils/filesUtils');
+    const fileUtils = require('../../utils/filesUtils');
     fileUtils.getConfigFile = jest.fn().mockImplementation(() => {
       return configMock;
     });
@@ -191,7 +191,7 @@ describe('editDevice', () => {
 
   test('edits device outputs', async () => {
     const message = { device: 'MODULE_01', output: '1', pin: 1, disabled: true };
-    const fileUtils = require('../utils/filesUtils');
+    const fileUtils = require('../../utils/filesUtils');
     fileUtils.getConfigFile = jest.fn().mockImplementation(() => {
       return configMock;
     });
@@ -207,7 +207,7 @@ describe('editDevice', () => {
 describe('calculateRatio', () => {
   test('calculates ratio', async () => {
     const message = { device: 'MODULE_01', output: '1', volume: 5 };
-    const fileUtils = require('../utils/filesUtils');
+    const fileUtils = require('../../utils/filesUtils');
     fileUtils.getConfigFile = jest.fn().mockImplementation(() => {
       return configMock;
     });

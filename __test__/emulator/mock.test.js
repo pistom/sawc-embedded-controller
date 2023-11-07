@@ -1,6 +1,6 @@
 describe('mock', () => {
   test('MCP23017', async () => {
-    const { MCP23x17 } = require('./mock');
+    const { MCP23x17 } = require('../../emulator/mock');
     const mcp = MCP23x17('MODULE_01');
     await mcp.begin();
     const pin = 1;
@@ -15,7 +15,7 @@ describe('mock', () => {
   });
 
   test('Gpio', async () => {
-    const { Gpio } = require('./mock');
+    const { Gpio } = require('../../emulator/mock');
     const gpio = Gpio(1, 'out');
     expect(gpio.direction).toBe('out');
     expect(gpio.writeSync).toBeDefined();

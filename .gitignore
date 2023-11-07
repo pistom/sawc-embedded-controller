@@ -1,5 +1,6 @@
 # Data
 config.yml
+schedule.yml
 emulator/state.json
 # Dependency directories
 node_modules/
