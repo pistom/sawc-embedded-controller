@@ -1,5 +1,6 @@
 preferences:
   theme: light
+  token: 1234567890
 devices:
   MODULE_01:
     name: Terrace

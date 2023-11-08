@@ -16,12 +16,22 @@ app.use(express.urlencoded({ extended: true }));
 require('./config.js').getConfig();
 const { queues } = require('./queue/queue.js');
 const { getConfigFile, getScheduleFile } = require('./utils/filesUtils');
+const authMiddleware = require('./middleware/auth.js');
 
 const initServer = async () => {
 
   io.on("connection", async (socket) => {
-    socket.on("message",
+    const requestToken = socket.handshake.auth.token;
+    const token = require('./config.js').config.preferences?.token?.toString();
+    if (token && requestToken !== token) {
+      socket.emit('welcome_message', { status: 'error', message: 'Invalid token' });
+      socket.disconnect();
+      return;
+    } else {
+      socket.emit('welcome_message', { status: 'success', message: 'Hello' });
+    }
 
+    socket.on("message",
       /**
        * @param {WaterMessage} message
        * @param {function} cb
@@ -64,6 +74,7 @@ const initServer = async () => {
     socket.on("disconnect", () => {});
   });
 
+  app.use(authMiddleware);
   app.get('/config', (req, res) => {
     res.json({ config: getConfigFile() });
   });
@@ -90,6 +101,14 @@ const initServer = async () => {
   app.get('/gpio/:number/:state', (req, res) => {
     require('./devices/gpio').setGpio(req.params.number, 'out', req.params.state === 'on' ? 1 : 0);
     res.json({ status: 'success' });
+  });
+
+  app.post('/token', (req, res) => {
+    const token = req.body.token;
+    const { config } = require('./config.js');
+    config.preferences.token = token;
+    require('./config.js').saveConfig(config);
+    res.json({ token: config.preferences.token });
   });
 
   return server;
