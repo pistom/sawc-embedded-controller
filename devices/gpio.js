@@ -1,5 +1,4 @@
 const isPi = require('detect-rpi');
-const devices = require('../devices').devices;
 
 let GPIO
 if (isPi()) {
@@ -9,6 +8,7 @@ if (isPi()) {
 }
 
 const initOutput = (gpioNumber, direction) => {
+  const devices = require('../devices').devices;
   if (!devices.GPIO) {
     devices.GPIO = {};
   }
@@ -16,7 +16,8 @@ const initOutput = (gpioNumber, direction) => {
 }
 
 const setGpio = (gpioNumber, direction, state) => {
-  if (!devices.GPIO) {
+  const devices = require('../devices').devices;
+  if (!devices.GPIO || !devices.GPIO[gpioNumber]) {
     initOutput(gpioNumber, direction);
   } else if (devices.GPIO[gpioNumber]?.direction !== direction) {
     devices.GPIO[gpioNumber].unexport();
