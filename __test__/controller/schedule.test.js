@@ -22,6 +22,7 @@ describe('schedule', () => {
       type: 'always',
       output: 1,
       device: 'MODULE_01',
+      startDate: '2020-01-01',
       days: ['Monday', 'Tuesday'],
       watering: [{time: '12:00', volume: 100}],
     }
@@ -30,6 +31,7 @@ describe('schedule', () => {
       id: 1,
       type: 'always',
       output: 1,
+      startDate: '2020-01-01',
       device: 'MODULE_01',
       days: ['Monday', 'Tuesday'],
       watering: [{time: '12:00', volume: 100}],
@@ -101,6 +103,7 @@ describe('schedule', () => {
       type: 'always',
       output: 1,
       device: 'MODULE_01',
+      startDate: '2020-01-01',
       repeatEvery: 2,
       watering: [{time: '12:00', volume: 100}],
     }
@@ -111,6 +114,7 @@ describe('schedule', () => {
       output: 1,
       device: 'MODULE_01',
       repeatEvery: 2,
+      startDate: '2020-01-01',
       watering: [{time: '12:00', volume: 100}],
     });
     expect(scheduleMock.events[0].repeatEvery).toEqual(2);

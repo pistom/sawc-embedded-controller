@@ -1,15 +1,23 @@
 const fs = require('fs');
 const yaml = require('js-yaml');
 
-const createFileIfNotExists = fileName => {
+const createDirectoryIfNotExists = (directoryName) => {
   try {
-    fs.accessSync(fileName, fs.constants.F_OK);
+    fs.accessSync(directoryName, fs.constants.F_OK);
   } catch (err) {
-    fs.writeFileSync(fileName, '{}');
+    fs.mkdirSync(directoryName);
   }
 }
 
-const emptyFile = fileName => {
+const createFileIfNotExists = (fileName, content = '{}') => {
+  try {
+    fs.accessSync(fileName, fs.constants.F_OK);
+  } catch (err) {
+    fs.writeFileSync(fileName, content);
+  }
+}
+
+const emptyFile = (fileName, content = '{}') => {
   fs.writeFileSync(fileName, '{}');
 }
 
@@ -45,6 +53,18 @@ const saveConfigFile = config => {
   fs.writeFileSync('./config.yml', yaml.dump(config));
 }
 
+const writeFile = (fileName, content, type = 'json') => {
+  switch (type) {
+    case 'json':
+      content = JSON.stringify(content);
+      break;
+    case 'yaml':
+      content = yaml.dump(content);
+      break;
+  }
+  fs.writeFileSync(fileName, content);
+}
+
 module.exports = {
   getConfigFile,
   getScheduleFile,
@@ -53,4 +73,6 @@ module.exports = {
   createFileIfNotExists,
   deleteFile,
   saveScheduleFile,
+  createDirectoryIfNotExists,
+  writeFile,
 };

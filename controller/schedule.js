@@ -9,6 +9,16 @@ const getTimeStringFromDateTimeString = (dateTimeString) => {
   return `${hours}:${minutes}`;
 }
 
+const getDateStringFromDateTimeString = (dateTimeString) => {
+  if (/^([01]\d|2[0-3]):([0-5]\d)$/.test(dateTimeString)) return null;
+  const date = new Date(dateTimeString);
+  if (date.toString() === 'Invalid Date') return null;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 const getCommonData = (eventData) => {
   const watering = eventData.watering.map(watering => ({
     time: getTimeStringFromDateTimeString(watering.time),
@@ -18,6 +28,7 @@ const getCommonData = (eventData) => {
     type: eventData.type,
     output: eventData.output,
     device: eventData.device,
+    startDate: getDateStringFromDateTimeString(eventData.startDate),
     watering,
   };
   return event;
@@ -45,8 +56,7 @@ const getDataForPeriodTypeEvent = (eventData) => {
   const event = {
     ...getCommonData(eventData),
     ...getRepeatData(eventData),
-    startDate: eventData.startDate,
-    endDate: eventData.endDate,
+    endDate: getDateStringFromDateTimeString(eventData.endDate),
   };
   return event;
 }
@@ -54,7 +64,6 @@ const getDataForPeriodTypeEvent = (eventData) => {
 const getDataForOnceTypeEvent = (eventData) => {
   const event = {
     ...getCommonData(eventData),
-    startDate: eventData.startDate,
   };
   return event;
 }

@@ -2,6 +2,7 @@
 config.yml
 schedule.yml
 emulator/state.json
+logs
 # Dependency directories
 node_modules/
 # Optional npm cache directory

@@ -144,9 +144,13 @@ describe('Consumer', () => {
     expect(queues['MODULE_01'].consumer).toBeInstanceOf(Consumer);
     expect(queues['MODULE_01'].queue[0].status).toBe('running');
     await jest.runAllTimers();
+    await jest.runAllTimers();
     expect(queues['MODULE_01'].queue.length).toBe(2);
     await jest.runAllTimers();
+    await jest.runAllTimers();
+    await jest.runAllTimers();
     expect(queues['MODULE_01'].queue.length).toBe(1);
+    await jest.runAllTimers();
     await jest.runAllTimers();
     await jest.runAllTimers();
     expect(queues['MODULE_01']).toBeUndefined();

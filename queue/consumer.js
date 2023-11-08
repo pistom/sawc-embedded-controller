@@ -13,18 +13,23 @@ class Consumer {
     const io = this.io;
     const device = this.device;
     const queue = queues[device];
+    const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
     while (queue.queue.length > 0) {
-      const { output, duration, startCallback, endCallback } = queue.queue[0];
+      const { output, duration, startCallback, endCallback, dateTime, type } = queue.queue[0];
       queue.queue[0].status = 'running';
-      startCallback(device, output);
-      io.emit('message', { device, output, status: 'watering', duration });
+      await startCallback(device, output);
+      io.emit('message', { device, output, status: 'watering', duration, dateTime, type });
+      const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
       queue.queue[0].sleep = sleep(duration);
       await queue.queue[0].sleep.promise;
       if (queue.queue[0]?.output === output) {
-        const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
-        setTimeout(async () => {
+        if(queue.queue[1]) {
           await endCallback(device, output);
-        }, delayOff);
+        } else {
+          setTimeout(async () => {
+            await endCallback(device, output);
+          }, delayOff);
+        }
         queue.shift();
         io.emit('message', { device, output, status: 'done' });
       }

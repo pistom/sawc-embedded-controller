@@ -43,13 +43,15 @@ class Queue {
     return Number((volume / outputRatio).toFixed(0));
   }
 
-  add(output, volume, startCallback, endCallback) {
+  add(output, volume, startCallback, endCallback, type = 'manual', dateTime = new Date()) {
     this.queue.push({ 
       output, 
       duration: this.convertToDuration(output, volume), 
       volume, 
       startCallback, 
-      endCallback 
+      endCallback,
+      type,
+      dateTime
     });
   }
 
