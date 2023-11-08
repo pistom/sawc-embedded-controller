@@ -132,7 +132,7 @@ describe('socket', () => {
       transports: ['websocket']
     });
 
-    jest.mock('../controller/controller');
+    jest.mock('../controller/wateringCan');
     ioClient.on('connect', () => {
       done();
     });
@@ -148,63 +148,63 @@ describe('socket', () => {
 
   it('startWater', (done) => {
     ioClient.emit('message', { action: 'startWater', device: '1', output: '1' }, (arg) => {
-      expect(require('../controller/controller').startWater).toHaveBeenCalledWith({}, { action: 'startWater', device: '1', output: '1' }, expect.anything());
+      expect(require('../controller/wateringCan').startWater).toHaveBeenCalledWith({}, { action: 'startWater', device: '1', output: '1' }, expect.anything());
       done();
     });
 
   });
   it('stopWater', (done) => {
     ioClient.emit('message', { action: 'stopWater', device: '1', output: '1' }, (arg) => {
-      expect(require('../controller/controller').stopWater).toHaveBeenCalledWith({}, { action: 'stopWater', device: '1', output: '1' }, expect.anything());
+      expect(require('../controller/wateringCan').stopWater).toHaveBeenCalledWith({}, { action: 'stopWater', device: '1', output: '1' }, expect.anything());
       done();
     });
   });
   it('getRemainingTimes', (done) => {
     const message = { action: 'getRemainingTimes', device: '1' };
     ioClient.emit('message', message, (arg) => {
-      expect(require('../controller/controller').getRemainingTimes).toHaveBeenCalledWith({}, message.device, expect.anything());
+      expect(require('../controller/wateringCan').getRemainingTimes).toHaveBeenCalledWith({}, message.device, expect.anything());
       done();
     });
   });
   it('editOutput', (done) => {
     const message = { action: 'editOutput', device: '1', output: '1', name: 'test' };
     ioClient.emit('message', message, (arg) => {
-      expect(require('../controller/controller').editOutput).toHaveBeenCalledWith(message, expect.anything());
+      expect(require('../controller/wateringCan').editOutput).toHaveBeenCalledWith(message, expect.anything());
       done();
     });
   });
   it('editDevice', (done) => {
     const message = { action: 'editDevice', device: '1', name: 'test' };
     ioClient.emit('message', message, (arg) => {
-      expect(require('../controller/controller').editDevice).toHaveBeenCalledWith(message, expect.anything());
+      expect(require('../controller/wateringCan').editDevice).toHaveBeenCalledWith(message, expect.anything());
       done();
     });
   });
   it('editDeviceOutput', (done) => {
     const message = { action: 'editDeviceOutput', device: '1', output: '1', name: 'test' };
     ioClient.emit('message', message, (arg) => {
-      expect(require('../controller/controller').editDeviceOutput).toHaveBeenCalledWith(message, expect.anything());
+      expect(require('../controller/wateringCan').editDeviceOutput).toHaveBeenCalledWith(message, expect.anything());
       done();
     });
   });
   it('calibrate', (done) => {
     const message = { action: 'calibrate', device: '1', output: '1' };
     ioClient.emit('message', message, (arg) => {
-      expect(require('../controller/controller').calibrate).toHaveBeenCalledWith({}, message, expect.anything());
+      expect(require('../controller/wateringCan').calibrate).toHaveBeenCalledWith({}, message, expect.anything());
       done();
     });
   });
   it('stopCalibrating', (done) => {
     const message = { action: 'stopCalibrating', device: '1', output: '1' };
     ioClient.emit('message', message, (arg) => {
-      expect(require('../controller/controller').stopCalibrating).toHaveBeenCalledWith(message, expect.anything());
+      expect(require('../controller/wateringCan').stopCalibrating).toHaveBeenCalledWith(message, expect.anything());
       done();
     });
   });
   it('calculateRatio', (done) => {
     const message = { action: 'calculateRatio', device: '1', output: '1' };
     ioClient.emit('message', message, (arg) => {
-      expect(require('../controller/controller').calculateRatio).toHaveBeenCalledWith(message, expect.anything());
+      expect(require('../controller/wateringCan').calculateRatio).toHaveBeenCalledWith(message, expect.anything());
       done();
     });
   });

@@ -1,5 +1,6 @@
-const { startWater, stopWater, calibrate, stopCalibrating, editOutput, editDevice, editDeviceOutput, calculateRatio, getRemainingTimes } = require('../../controller/controller');
-const { Queue, Consumer } = require('../../controller/queues');
+const { startWater, stopWater, calibrate, stopCalibrating, editOutput, editDevice, editDeviceOutput, calculateRatio, getRemainingTimes } = require('../../controller/wateringCan');
+const { Queue } = require('../../queue/queue');
+const { Consumer } = require('../../queue/consumer');
 const { startPump, stopPump } = require('../../controller/pump');
 jest.mock('../../controller/pump');
 const { outputOn, outputOff } = require('../../controller/inputOutput');

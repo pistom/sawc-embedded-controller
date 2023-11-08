@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 require('./config.js').getConfig();
-const { queues } = require('./controller/queues');
+const { queues } = require('./queue/queue.js');
 const { getConfigFile, getScheduleFile } = require('./utils/filesUtils');
 
 const initServer = async () => {
@@ -30,31 +30,31 @@ const initServer = async () => {
       async (message, cb) => {
         switch (message.action) {
           case 'startWater':
-            await require('./controller/controller').startWater(queues, message, io);
+            await require('./controller/wateringCan.js').startWater(queues, message, io);
             break;
           case 'stopWater':
-            await require('./controller/controller').stopWater(queues, message, io);
+            await require('./controller/wateringCan.js').stopWater(queues, message, io);
             break;
           case 'getRemainingTimes':
-            require('./controller/controller').getRemainingTimes(queues, message.device, io);
+            require('./controller/wateringCan.js').getRemainingTimes(queues, message.device, io);
             break;
           case 'editOutput':
-            require('./controller/controller').editOutput(message, io);
+            require('./controller/wateringCan.js').editOutput(message, io);
             break;
           case 'editDevice':
-            require('./controller/controller').editDevice(message, io);
+            require('./controller/wateringCan.js').editDevice(message, io);
             break;
           case 'editDeviceOutput':
-            require('./controller/controller').editDeviceOutput(message, io);
+            require('./controller/wateringCan.js').editDeviceOutput(message, io);
             break;
           case 'calibrate':
-            require('./controller/controller').calibrate(queues, message, io);
+            require('./controller/wateringCan.js').calibrate(queues, message, io);
             break;
           case 'stopCalibrating':
-            require('./controller/controller').stopCalibrating(message, io);
+            require('./controller/wateringCan.js').stopCalibrating(message, io);
             break;
           case 'calculateRatio':
-            require('./controller/controller').calculateRatio(message, io);
+            require('./controller/wateringCan.js').calculateRatio(message, io);
             break;
         }
         cb && cb(message.action);
