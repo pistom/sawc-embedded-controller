@@ -1,5 +1,5 @@
 [![Test](https://github.com/pistom/sawc-embedded-controller/actions/workflows/test.yml/badge.svg)](https://github.com/pistom/sawc-embedded-controller/actions/workflows/test.yml)
-[![Coverage Statements](https://gist.githubusercontent.com/pistom/365dc9c90edfe42bb84f579461e23a6e/raw/d9b001d3ade0a06f395fc1cec273a2be9efeab3e/badge-statements.svg)](https://github.com/pistom/sawc-embedded-controller/actions)
+[![Coverage Statements](https://raw.githubusercontent.com/gist/pistom/365dc9c90edfe42bb84f579461e23a6e/raw/badge-statements.svg)](https://github.com/pistom/sawc-embedded-controller/actions)
 
 # Smart Automatic Watering Conroller
 
