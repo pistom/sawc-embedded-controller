@@ -5,10 +5,17 @@ node_path=$(which node)
 apps_location="$(cd "$(dirname "$0")" && cd ../ && pwd)"
 username="$SUDO_USER"
 
-names=("app" "controller")
+declare -A names_map
+names_map["app"]="app,server.js"
+names_map["controller"]="controller,server.js"
+names_map["worker"]="controller,worker.js"
 
-for name in "${names[@]}"
+# iterate through names_map
+for name in "${!names_map[@]}"
 do
+IFS=',' read -r -a value <<< "${names_map[$name]}"
+echo "Service: $name"
+
 content="[Unit] \n\
 Description=SAWC $name \n\
 After=network.target \n\
@@ -17,13 +24,15 @@ After=network.target \n\
 Environment=NODE_ENV=prod \n\
 Type=simple \n\
 User=$username \n\
-WorkingDirectory=$apps_location/sawc-embedded-$name \n\
-ExecStart=$node_path $apps_location/sawc-embedded-$name/server.js \n\
+WorkingDirectory=$apps_location/sawc-embedded-${value[0]} \n\
+ExecStart=$node_path $apps_location/sawc-embedded-${value[0]}/${value[1]} \n\
 Restart=on-failure \n\
 \n\
 [Install] \n\
 WantedBy=multi-user.target"
+
 echo -e "$content" | sudo tee "/etc/systemd/system/sawc-$name.service" > /dev/null
+
 done
 
 sudo systemctl daemon-reload
