@@ -15,11 +15,10 @@ class Consumer {
     const queue = queues[device];
     const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
     while (queue.queue.length > 0) {
-      const { output, duration, startCallback, endCallback, dateTime, type } = queue.queue[0];
+      const { output, duration, startCallback, endCallback, dateTime, type, context } = queue.queue[0];
       queue.queue[0].status = 'running';
       await startCallback(device, output);
-      io.emit('message', { device, output, status: 'watering', duration, dateTime, type });
-      const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
+      io.emit('message', { device, output, status: 'watering', duration, dateTime, type, context });
       queue.queue[0].sleep = sleep(duration);
       await queue.queue[0].sleep.promise;
       if (queue.queue[0]?.output === output) {
@@ -31,7 +30,7 @@ class Consumer {
           }, delayOff);
         }
         queue.shift();
-        io.emit('message', { device, output, status: 'done' });
+        io.emit('message', { device, output, status: 'done', duration, dateTime, type, context });
       }
     }
     await finishCallback(device);

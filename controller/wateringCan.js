@@ -16,13 +16,13 @@ const startWater = async (queues, message, io) => {
     io.emit('message', { status: 'calibratingError', device: message.device, output: message.output, message: 'Cannot start water while calibrating' });
     return;
   }
-  const { device, output, volume, type, dateTime } = message;
+  const { device, output, volume, type, dateTime, context } = message;
   if (!queues[device]) {
     await startPump(device);
     queues[device] = new Queue(device, io);
   }
   const queue = queues[device];
-  queue.add(output, volume, outputOn, outputOff, type, dateTime);
+  queue.add(output, volume, outputOn, outputOff, type, dateTime, context);
   io.emit('message', { status: 'remainingTimes', device, remainingTimes: queue.getRemainingTimes() });
   if (!queue.consumer) {
     queue.consumer = new Consumer(queues, device, io);

@@ -65,6 +65,10 @@ const writeFile = (fileName, content, type = 'json') => {
   fs.writeFileSync(fileName, content);
 }
 
+const appendFile = (fileName, content) => {
+  fs.appendFileSync(fileName, content + '\n');
+}
+
 module.exports = {
   getConfigFile,
   getScheduleFile,
@@ -75,4 +79,5 @@ module.exports = {
   saveScheduleFile,
   createDirectoryIfNotExists,
   writeFile,
+  appendFile,
 };

@@ -2,6 +2,7 @@ const e = require("express");
 const { Manager } = require("socket.io-client");
 const { createFileIfNotExists } = require("./utils/filesUtils");
 require('./config.js').getConfig();
+const lastMinuteData = [];
 
 const manager = new Manager("http://localhost:3001", {
   reconnectionDelayMax: 10000,
@@ -62,11 +63,13 @@ const filterScheduleEventsToWaterToday = () => {
     })
 }
 
-const lastMinuteData = [];
-
-const getTimeString = (date = new Date()) => {
+const getTimeString = (date = new Date(), seconds = false) => {
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
+  if (seconds) {
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  }
   return `${hours}:${minutes}`;
 }
 
@@ -74,7 +77,6 @@ const getDataForStartWaterNow = (events) => {
   const data = [];
   events.forEach(event => {
     event.watering.forEach((watering, index) => {
-      // if (lastMinuteData.includes(`${event.id}-${index}`)) return;
       if (lastMinuteData.find(item => item[1] === `${event.id}-${index}`)) return;
       if (watering.time === getTimeString()) {
         data.push({
@@ -96,12 +98,21 @@ const logWateringDataInAFile = (data) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  const fileName = `watering_${year}-${month}-${day}.json`;
+  const fileName = `watering_${year}-${month}-${day}.log`;
   require('./utils/filesUtils').createDirectoryIfNotExists('logs');
-  require('./utils/filesUtils').createFileIfNotExists(`logs/${fileName}`, '[]');
-  const log = require(`./logs/${fileName}`);
-  log.push(data);
-  require('./utils/filesUtils').writeFile(`logs/${fileName}`, log);
+  require('./utils/filesUtils').createFileIfNotExists(`logs/${fileName}`, '');
+  const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  let line = `[${dateStr} ${getTimeString()}] `;
+  line += `Type: ${data.type}, `;
+  line += `Device: ${data.device}, `;
+  line += `Output: ${data.output}, `;
+  line += `Status: ${data.status}, `;
+  line += `Duration: ${data.duration} s, `;
+  line += `Send startWater at: ${data.dateTime}, `;
+  if (data.context) {
+    line += `Context: ${JSON.stringify(data.context)}, `;
+  }
+  require('./utils/filesUtils').appendFile(`logs/${fileName}`, line);
 }
 
 socket.on("message", (message) => {
@@ -128,10 +139,12 @@ setInterval(() => {
   const data = getDataForStartWaterNow(events);
   data.forEach(data => {
     lastMinuteData.push([new Date(), `${data.eventId}-${data.wateringIndex}`]);
-    socket.emit('message', { action: 'startWater', ...data, type: 'scheduled' });
+    socket.emit('message', { action: 'startWater', ...data, type: 'scheduled', context: {scheduleEventId: data.eventId} });
   });
   removeOlderThanOneMinuteData(lastMinuteData);
-}, 1000);
+  const used = process.memoryUsage().heapUsed / 1024 / 1024;
+  socket.emit('message', { action: 'heartbeat', process: 'worker', memory: `${Math.round(used * 100) / 100} MB` });
+}, 5000);
 
 socket.on("disconnect", () => {
   console.log('Disconnected from server');

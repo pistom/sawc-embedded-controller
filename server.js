@@ -66,6 +66,8 @@ const initServer = async () => {
           case 'calculateRatio':
             require('./controller/wateringCan.js').calculateRatio(message, io);
             break;
+          case 'heartbeat':
+            require('./controller/heartbeat.js').heartbeat(message, io);
         }
         cb && cb(message.action);
       });
