@@ -3,7 +3,17 @@
 filename="sawcctrl.service"
 node_path=$(which node)
 apps_location="$(cd "$(dirname "$0")" && cd ../ && pwd)"
-username="$SUDO_USER"
+
+# determine username. if sudo, use SUDO_USER
+if [ "$EUID" -ne 0 ]
+  then username="$USER"
+  else
+    if [ -z "$SUDO_USER" ]
+      then username="$USER"
+      else
+        username="$SUDO_USER"
+    fi
+fi
 
 declare -A names_map
 names_map["app"]="app,server.js"
@@ -32,12 +42,11 @@ Restart=on-failure \n\
 WantedBy=multi-user.target"
 
 echo -e "$content" | sudo tee "/etc/systemd/system/sawc-$name.service" > /dev/null
-
 done
 
 sudo systemctl daemon-reload
 
-for name in "${names[@]}"
+for name in "${!names_map[@]}"
 do
 sudo systemctl enable sawc-$name.service
 sudo systemctl start sawc-$name.service
