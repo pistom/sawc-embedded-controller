@@ -48,7 +48,7 @@ const stopWater = async (queues, message, io) => {
     if (queueElement) {
       // Checki if the output is currently set to on
       if (queueElement.status === 'running') {
-        queueElement.sleep.abort();
+        queueElement.sleep.resume();
         setTimeout(async () => {
           queueElement.endCallback(device, output);
         }, 500);
@@ -133,24 +133,35 @@ const calibrate = async (queues, message, io) => {
   await startPump(device);
   await outputOn(device, output);
   io.emit('message', { status: 'calibratingWaterStarted', duration, device, output });
-  await calibrating.calibrateSleep.promise
-  await stopPump(device);
-  if (calibrating.isCalibrating) {
+  // await calibrating.calibrateSleep.promise
+  // await stopPump(device);
+  // if (calibrating.isCalibrating) {
+  //   await outputOff(device, output);
+  //   io.emit('message', { status: 'calibratingWaterStopped', duration, device, output });
+  //   calibrating.isCalibrating = false;
+  // }
+  calibrating.calibrateSleep.promise.then(async () => {
+    await stopPump(device);
     await outputOff(device, output);
     io.emit('message', { status: 'calibratingWaterStopped', duration, device, output });
     calibrating.isCalibrating = false;
-  }
+  }).catch(async () => {
+    calibrating.isCalibrating = false;
+    await stopPump(device);
+    await outputOff(device, output);
+    io.emit('message', { status: 'calibratingWaterAborted', duration, device, output });
+  });
 }
 
 const stopCalibrating = async (message, io) => {
   const calibrating = require('./calibrating.js');
   const { device, output } = message;
   if (calibrating.isCalibrating) {
-    calibrating.calibrateSleep.abort();
-    await stopPump(device);
-    await outputOff(device, output);
-    io.emit('message', { status: 'calibratingWaterAborted', device, output });
-    calibrating.isCalibrating = false;
+    calibrating.calibrateSleep.cancel();
+    setTimeout(() => {
+      console.dir('####')
+      console.dir(calibrating)
+    }, 200)
   }
 }
 

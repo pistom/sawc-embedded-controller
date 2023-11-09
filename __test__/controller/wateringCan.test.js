@@ -9,6 +9,7 @@ let ioMock;
 let queues = {};
 const { configMock } = require('../../__mocks__/configMock');
 const { sleep } = require('../../utils/sleep');
+const calibrating = require('../../controller/calibrating');
 
 afterAll(() => {
   jest.resetAllMocks();
@@ -81,11 +82,23 @@ describe('calibrate', () => {
   it('should stop calibrating if calibrateDuration is aborted', async () => {
     ioMock = require('../../__mocks__/ioMock');
     const calibrateMessage = { device: 'MODULE_01', output: '1' };
+
+    jest.mock('../../controller/calibrating');
+    require('../../controller/calibrating').isCalibrating = false;
+    require('../../controller/calibrating').calibrateSleep = null;
+
     const calibratingModule = require('../../controller/calibrating');
-    calibratingModule.isCalibrating = true;
-    calibratingModule.calibrateSleep = sleep(2);
+    console.dir(calibratingModule);
+    calibrate({}, calibrateMessage, ioMock);
     await stopCalibrating(calibrateMessage, ioMock);
-    expect(ioMock.emit).toHaveBeenCalledWith('message', { status: 'calibratingWaterAborted', device: 'MODULE_01', output: '1' });
+    await jest.runAllTimers();
+    await jest.runAllTimers();
+    await jest.runAllTimers();
+    await jest.runAllTimers();
+    await jest.runAllTimers();
+    expect(calibratingModule.isCalibrating).toBe(false);
+    expect(ioMock.emit).toHaveBeenLastCalledWith("message", {"device": "MODULE_01", "duration": 10, "output": "1", "status": "calibratingWaterAborted"});
+    // expect(ioMock.emit).toHaveBeenCalledTimes(2);
     expect(stopPump).toHaveBeenCalledWith('MODULE_01');
     expect(outputOff).toHaveBeenCalledWith('MODULE_01', '1');
   });
