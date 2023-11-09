@@ -17,7 +17,7 @@ IFS=',' read -r -a value <<< "${names_map[$name]}"
 echo "Service: $name"
 
 content="[Unit] \n\
-Description=SAWC $name \n\
+Description=SAWC $key \n\
 After=network.target \n\
 \n\
 [Service] \n\
