@@ -1,6 +1,6 @@
 preferences:
-  theme: light
-  token: 1234567890
+  theme: light                     # Not implemented yet
+  token: 1234567890                # If null, front-end app will not be needed to authenticate. Use it to prevent unauthorized access from local network.
 devices:
   MODULE_01:
     name: Terrace

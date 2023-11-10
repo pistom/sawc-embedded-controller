@@ -6,7 +6,8 @@
   "scripts": {
     "start": "supervisor server.js",
     "emulator": "node emulator/watcher.js & http-server emulator/ -p 3030 -o",
-    "dev": "npm start & npm run emulator",
+    "dev": "npm start",
+    "dev:emulator": "npm start & npm run emulator",
     "test": "jest",
     "test:coverage": "jest --detectOpenHandles --coverage",
     "test:badges": "yarn run test:coverage && jest-coverage-badges",

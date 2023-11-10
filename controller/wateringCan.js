@@ -155,13 +155,8 @@ const calibrate = async (queues, message, io) => {
 
 const stopCalibrating = async (message, io) => {
   const calibrating = require('./calibrating.js');
-  const { device, output } = message;
   if (calibrating.isCalibrating) {
     calibrating.calibrateSleep.cancel();
-    setTimeout(() => {
-      console.dir('####')
-      console.dir(calibrating)
-    }, 200)
   }
 }
 

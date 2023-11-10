@@ -88,7 +88,6 @@ describe('calibrate', () => {
     require('../../controller/calibrating').calibrateSleep = null;
 
     const calibratingModule = require('../../controller/calibrating');
-    console.dir(calibratingModule);
     calibrate({}, calibrateMessage, ioMock);
     await stopCalibrating(calibrateMessage, ioMock);
     await jest.runAllTimers();
@@ -98,7 +97,6 @@ describe('calibrate', () => {
     await jest.runAllTimers();
     expect(calibratingModule.isCalibrating).toBe(false);
     expect(ioMock.emit).toHaveBeenLastCalledWith("message", {"device": "MODULE_01", "duration": 10, "output": "1", "status": "calibratingWaterAborted"});
-    // expect(ioMock.emit).toHaveBeenCalledTimes(2);
     expect(stopPump).toHaveBeenCalledWith('MODULE_01');
     expect(outputOff).toHaveBeenCalledWith('MODULE_01', '1');
   });
