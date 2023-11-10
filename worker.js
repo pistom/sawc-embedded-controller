@@ -1,6 +1,5 @@
 const e = require("express");
 const { Manager } = require("socket.io-client");
-const { createFileIfNotExists } = require("./utils/filesUtils");
 require('./config.js').getConfig();
 const lastMinuteData = [];
 
@@ -10,7 +9,7 @@ const manager = new Manager("http://localhost:3001", {
 
 const socket = manager.socket("/", {
   auth: {
-    token: require('./config.js').config.preferences?.token.toString(),
+    token: require('./config.js').config.preferences?.token?.toString(),
   }
 });
 
@@ -63,22 +62,12 @@ const filterScheduleEventsToWaterToday = () => {
     })
 }
 
-const getTimeString = (date = new Date(), seconds = false) => {
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  if (seconds) {
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}`;
-  }
-  return `${hours}:${minutes}`;
-}
-
 const getDataForStartWaterNow = (events) => {
   const data = [];
   events.forEach(event => {
     event.watering.forEach((watering, index) => {
       if (lastMinuteData.find(item => item[1] === `${event.id}-${index}`)) return;
-      if (watering.time === getTimeString()) {
+      if (watering.time === require('./utils/dateUtils').getTimeString()) {
         data.push({
           device: event.device,
           output: event.output,
@@ -94,15 +83,12 @@ const getDataForStartWaterNow = (events) => {
 }
 
 const logWateringDataInAFile = (data) => {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const fileName = `watering_${year}-${month}-${day}.log`;
+  const dateString = require('./utils/dateUtils').getDateString();
+  const timeString = require('./utils/dateUtils').getTimeString();
+  const fileName = `watering_${dateString}.log`;
   require('./utils/filesUtils').createDirectoryIfNotExists('logs');
   require('./utils/filesUtils').createFileIfNotExists(`logs/${fileName}`, '');
-  const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  let line = `[${dateStr} ${getTimeString()}] `;
+  let line = `[${dateString} ${timeString}}] `;
   line += `Type: ${data.type}, `;
   line += `Device: ${data.device}, `;
   line += `Output: ${data.output}, `;

@@ -9,14 +9,15 @@ const port = process.env.NODE_ENV === 'test' ? 3301 : 3001;
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {cors: {origin: true}});
+const authMiddleware = require('./middleware/auth.js');
 app.use(cors({origin: true}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(authMiddleware);
 
 require('./config.js').getConfig();
 const { queues } = require('./queue/queue.js');
 const { getConfigFile, getScheduleFile } = require('./utils/filesUtils');
-const authMiddleware = require('./middleware/auth.js');
 
 const initServer = async () => {
 
@@ -76,7 +77,6 @@ const initServer = async () => {
     socket.on("disconnect", () => {});
   });
 
-  app.use(authMiddleware);
   app.get('/config', (req, res) => {
     res.json({ config: getConfigFile() });
   });
@@ -111,6 +111,14 @@ const initServer = async () => {
     config.preferences.token = token;
     require('./config.js').saveConfig(config);
     res.json({ token: config.preferences.token });
+  });
+
+  app.get('/logs/:type', (req, res) => {
+    const { getLogs } = require('./utils/logsUtils.js');
+    const type = req.params.type;
+    const date = req.query.date || null;
+    const days = req.query.days || 7;
+    res.json(getLogs(type, date, days));
   });
 
   return server;
