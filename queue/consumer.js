@@ -9,6 +9,7 @@ class Consumer {
   }
 
   async consume(finishCallback) {
+    const { logWatering } = require('../utils/logsUtils');
     const queues = this.queues;
     const io = this.io;
     const device = this.device;
@@ -18,7 +19,9 @@ class Consumer {
       const { output, duration, startCallback, endCallback, dateTime, type, context } = queue.queue[0];
       queue.queue[0].status = 'running';
       await startCallback(device, output);
-      io.emit('message', { device, output, status: 'watering', duration, dateTime, type, context });
+      const message = { device, output, status: 'watering', duration, dateTime, type, context }
+      io.emit('message', message);
+      logWatering(message);
       queue.queue[0].sleep = sleep(duration);
       await queue.queue[0].sleep.promise;
       if (queue.queue[0]?.output === output) {
@@ -31,6 +34,7 @@ class Consumer {
         }
         queue.shift();
         io.emit('message', { device, output, status: 'done', duration, dateTime, type, context });
+        logWatering(message);
       }
     }
     await finishCallback(device);

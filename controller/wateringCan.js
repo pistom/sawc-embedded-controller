@@ -37,6 +37,7 @@ const startWater = async (queues, message, io) => {
  * @param {import('socket.io').Server} io
  */
 const stopWater = async (queues, message, io) => {
+  const { logWatering } = require('../utils/logsUtils');
   const { device, output } = message;
   const messageContent = { device, output, status: '', message: '' };
   if (!queues[device]) {
@@ -49,13 +50,15 @@ const stopWater = async (queues, message, io) => {
       // Checki if the output is currently set to on
       if (queueElement.status === 'running') {
         queueElement.sleep.resume();
+        const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
         setTimeout(async () => {
           queueElement.endCallback(device, output);
-        }, 500);
+        }, delayOff);
         messageContent.status = 'stopped';
       } else {
         messageContent.status = 'aborted';
       }
+      logWatering({ ...messageContent })
     } else {
       messageContent.status = 'error';
       messageContent.message = 'No queue element for output';

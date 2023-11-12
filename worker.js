@@ -69,8 +69,8 @@ const getDataForStartWaterNow = (events) => {
       if (lastMinuteData.find(item => item[1] === `${event.id}-${index}`)) return;
       if (watering.time === require('./utils/dateUtils').getTimeString()) {
         data.push({
-          device: event.device,
-          output: event.output,
+          device: event.device.toString(),
+          output: event.output.toString(),
           volume: watering.volume,
           dateTime: new Date(),
           eventId: event.id,
@@ -81,34 +81,6 @@ const getDataForStartWaterNow = (events) => {
   })
   return data;
 }
-
-const logWateringDataInAFile = (data) => {
-  const dateString = require('./utils/dateUtils').getDateString();
-  const timeString = require('./utils/dateUtils').getTimeString();
-  const fileName = `watering_${dateString}.log`;
-  require('./utils/filesUtils').createDirectoryIfNotExists('logs');
-  require('./utils/filesUtils').createFileIfNotExists(`logs/${fileName}`, '');
-  let line = `[${dateString} ${timeString}] `;
-  line += `Type: ${data.type}, `;
-  line += `Device: ${data.device}, `;
-  line += `Output: ${data.output}, `;
-  line += `Status: ${data.status}, `;
-  line += `Duration: ${data.duration} s, `;
-  line += `Send startWater at: ${data.dateTime}, `;
-  if (data.context) {
-    line += `Context: ${JSON.stringify(data.context)}, `;
-  }
-  require('./utils/filesUtils').appendFile(`logs/${fileName}`, line);
-}
-
-socket.on("message", (message) => {
-  if (message.status === 'watering') {
-    logWateringDataInAFile(message);
-  }
-  if (message.status === 'done') {
-    logWateringDataInAFile(message);
-  }
-});
 
 const removeOlderThanOneMinuteData = (lastMinuteData) => {
   const date = new Date();
