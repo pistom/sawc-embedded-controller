@@ -33,8 +33,8 @@ class Consumer {
           }, delayOff);
         }
         queue.shift();
-        io.emit('message', { device, output, status: 'done', duration, dateTime, type, context });
-        logWatering(message);
+        io.emit('message', { ...message, status: 'done'});
+        logWatering({ ...message, status: 'done'});
       }
     }
     await finishCallback(device);
