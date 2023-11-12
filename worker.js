@@ -88,7 +88,7 @@ const logWateringDataInAFile = (data) => {
   const fileName = `watering_${dateString}.log`;
   require('./utils/filesUtils').createDirectoryIfNotExists('logs');
   require('./utils/filesUtils').createFileIfNotExists(`logs/${fileName}`, '');
-  let line = `[${dateString} ${timeString}}] `;
+  let line = `[${dateString} ${timeString}] `;
   line += `Type: ${data.type}, `;
   line += `Device: ${data.device}, `;
   line += `Output: ${data.output}, `;
@@ -113,11 +113,9 @@ socket.on("message", (message) => {
 const removeOlderThanOneMinuteData = (lastMinuteData) => {
   const date = new Date();
   date.setMinutes(date.getMinutes() - 1);
-  lastMinuteData.forEach((item, index) => {
-    if (item[0] < date) {
-      lastMinuteData.splice(index, 1);
-    }
-  });
+  while (lastMinuteData.length > 0 && lastMinuteData[0][0] < date) {
+    lastMinuteData.shift();
+  }
 }
 
 setInterval(() => {
