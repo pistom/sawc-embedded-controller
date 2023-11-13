@@ -34,6 +34,17 @@ const filterScheduleEventsToWaterToday = () => {
       }
       return false;
     })
+    // Filter out events that are scheduled to run only once and already ran
+    .filter(event => {
+      if (event.type === 'once') {
+        const startDatePlusOneDay = new Date(event.startDate);
+        startDatePlusOneDay.setDate(startDatePlusOneDay.getDate() + 1);
+        if (startDatePlusOneDay < new Date()) {
+          return false;
+        }
+      }
+      return true;
+    })
     // Filter out events that days are not today
     .filter(event => {
       if (!event.days) return true;
