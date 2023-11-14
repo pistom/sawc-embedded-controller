@@ -1,7 +1,7 @@
 const e = require("express");
 const { Manager } = require("socket.io-client");
 require('./config.js').getConfig();
-const lastMinuteData = [];
+let lastMinuteData = [];
 
 const manager = new Manager("http://localhost:3001", {
   reconnectionDelayMax: 10000,
@@ -96,9 +96,7 @@ const getDataForStartWaterNow = (events) => {
 const removeOlderThanOneMinuteData = (lastMinuteData) => {
   const date = new Date();
   date.setMinutes(date.getMinutes() - 1);
-  while (lastMinuteData.length > 0 && lastMinuteData[0][0] < date) {
-    lastMinuteData.shift();
-  }
+  return lastMinuteData.filter(data => data[0] >= date);
 }
 
 setInterval(() => {
@@ -108,7 +106,7 @@ setInterval(() => {
     lastMinuteData.push([new Date(), `${data.eventId}-${data.wateringIndex}`]);
     socket.emit('message', { action: 'startWater', ...data, type: 'scheduled', context: {scheduleEventId: data.eventId} });
   });
-  removeOlderThanOneMinuteData(lastMinuteData);
+  lastMinuteData = removeOlderThanOneMinuteData(lastMinuteData);
   const used = process.memoryUsage().heapUsed / 1024 / 1024;
   socket.emit('message', { action: 'heartbeat', process: 'worker', memory: `${Math.round(used * 100) / 100} MB` });
 }, 5000);
