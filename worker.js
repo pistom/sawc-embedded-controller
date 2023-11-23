@@ -1,4 +1,3 @@
-const e = require("express");
 const { Manager } = require("socket.io-client");
 require('./config.js').getConfig();
 let lastMinuteData = [];

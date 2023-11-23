@@ -1,8 +1,13 @@
-let lastHeartbeat = new Date();
+let workerLastHeartbeat = new Date();
+let workerOnlineLastHeartbeat = new Date();
 let workingSince = new Date();
 
 const heartbeat = (message, io) => {
-  lastHeartbeat = new Date();
+  if (message.process === 'worker') {
+    workerLastHeartbeat = new Date();
+  } else if (message.process === 'workerOnline') {
+    workerOnlineLastHeartbeat = new Date();
+  }
   io.emit('message', message);
 }
 
@@ -14,7 +19,10 @@ const getAppStatus = (message, io) => {
       memoryUsage: `${Math.round((process.memoryUsage().heapUsed / 1024 / 1024) * 100) / 100} MB` 
     },
     worker: {
-      lastHeartbeat,
+      lastHeartbeat: workerLastHeartbeat,
+    },
+    workerOnline: {
+      lastHeartbeat: workerOnlineLastHeartbeat,
     }
   });
 }
