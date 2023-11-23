@@ -19,6 +19,7 @@ declare -A names_map
 names_map["app"]="app,server.js"
 names_map["controller"]="controller,server.js"
 names_map["worker"]="controller,worker.js"
+names_map["workeronline"]="controller,workeronline.js"
 
 # iterate through names_map
 for name in "${!names_map[@]}"
