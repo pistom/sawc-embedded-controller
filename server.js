@@ -73,6 +73,9 @@ const initServer = async () => {
           case 'getAppStatus':
             require('./controller/appStatus.js').getAppStatus(message, io);
             break;
+          case 'configFileEdited':
+            require('./controller/wateringCan.js').configFileEdited(io);
+            break;
         }
         cb && cb(message.action);
       });

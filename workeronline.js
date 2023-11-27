@@ -78,8 +78,8 @@ const requestToOnlineApi = async (endpoint, type = 'GET', body = null) => {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiToken}`
-     },
-     body: body ? JSON.stringify(body) : null
+      },
+      body: body ? JSON.stringify(body) : null
     });
     const data = await response.json();
     if (!response.ok && data.code === 401 && retryCount < 3) {
@@ -108,15 +108,66 @@ const requestToOnlineApi = async (endpoint, type = 'GET', body = null) => {
   return result;
 };
 
-const getMessagesFromOnlineApi = async () => {
-  return await requestToOnlineApi('/api/sawc/messages');
+const getMessagesToProcessFromOnlineApi = async () => {
+  return await requestToOnlineApi('/api/sawc/messages/process');
 }
 
+const syncDevicesWithOnlineApi = async (devices) => {
+  const response = await requestToOnlineApi(`/api/sawc/devices`, 'PUT', devices);
+  if (response.success && response.createdPlants) {
+    require('./config.js').getConfig();
+    let configFileEdited = false;
+    const config = require('./config.js').config;
+    Object.keys(response.createdPlants).forEach(deviceId => {
+      Object.keys(response.createdPlants[deviceId]).forEach(outputId => {
+        config.devices[deviceId].outputs[outputId].onlinePlantsIds = [response.createdPlants[deviceId][outputId][0]];
+        config.devices[deviceId].outputs[outputId].name = response.createdPlants[deviceId][outputId][1];
+        configFileEdited = true;
+      });
+    });
+    require('./config.js').saveConfig(config);
+    require('./config.js').getConfig();
+    configFileEdited && socket.emit('message', { action: 'configFileEdited'});
+  }
+}
+
+// Plants watering messages
+socket.on("message", async (data) => {
+  if (data.type === 'online') {
+    const content = {
+      action: data.context.action,
+      device: data.device,
+      output: data.output,
+      volume: data.context.volume,
+      duration: data.duration,
+      status: data.status,
+      sentToController: data.dateTime,
+    }
+    switch (data.status) {
+      case "watering":
+        await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'PUT', { content });
+        break;
+      case "done":
+        await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'PUT', { status: 'PROCESSED', content });
+        break;
+    }
+  }
+});
+
+socket.on("message", async (data) => {
+  switch (data.status) {
+    case "configEdited":
+    case "configOutputEdited":
+      await syncDevicesWithOnlineApi(data.config.devices);
+      break;
+  }
+});
+
 const processMessages = async () => {
-  const messages = await getMessagesFromOnlineApi();
+  const messages = await getMessagesToProcessFromOnlineApi();
   if (Array.isArray(messages)) {
     for (const message of messages) {
-      await requestToOnlineApi(`/api/sawc/messages/${message.id}`, 'PUT', { status: 'processed' });
+      socket.emit('message', { ...message.content, type: 'online', context: { onlineMessageId: message.id, volume: message.content.volume, action: message.content.action } })
     }
   }
 };
@@ -144,7 +195,7 @@ const init = async () => {
 
 setInterval(async () => {
   await init();
-}, 10000);
+}, 3000);
 
 setInterval(async () => {
   socket.emit('message', { action: 'heartbeat', process: 'workeronline', memory: getMemoryUsage(), onlineApiStatus: apiStatus });

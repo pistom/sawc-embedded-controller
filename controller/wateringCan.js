@@ -171,6 +171,11 @@ const calculateRatio = (message, io) => {
   return ratio;
 }
 
+const configFileEdited = io => {
+  const config = require('../utils/filesUtils.js').getConfigFile();
+  io.emit('message', { status: 'configFileEdited', config})
+}
+
 module.exports = {
   startWater,
   stopWater,
@@ -181,4 +186,5 @@ module.exports = {
   calibrate,
   stopCalibrating,
   calculateRatio,
+  configFileEdited,
 }
