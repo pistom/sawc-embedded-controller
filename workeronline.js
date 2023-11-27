@@ -113,7 +113,7 @@ const getMessagesToProcessFromOnlineApi = async () => {
 }
 
 const syncDevicesWithOnlineApi = async (devices) => {
-  const response = await requestToOnlineApi(`/api/sawc/devices`, 'PUT', devices);
+  const response = await requestToOnlineApi(`/api/sawc/devices`, 'POST', devices);
   if (response.success && response.createdPlants) {
     require('./config.js').getConfig();
     let configFileEdited = false;
@@ -145,10 +145,10 @@ socket.on("message", async (data) => {
     }
     switch (data.status) {
       case "watering":
-        await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'PUT', { content });
+        await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'POST', { content });
         break;
       case "done":
-        await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'PUT', { status: 'PROCESSED', content });
+        await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'POST', { status: 'PROCESSED', content });
         break;
     }
   }
