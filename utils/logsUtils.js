@@ -43,6 +43,27 @@ const logWatering = (data) => {
   }
   log('watering', line);
 }
+ 
+const syslog = (data) => {
+  let level = 'INFO';
+  switch (data.level) {
+    case 'error':
+      level = 'ERROR';
+      break;
+    case 'warning':
+      level = 'WARNING';
+      break;
+    default:
+      level = 'INFO';
+      break;
+  }
+  let line = `${level}: `;
+  line += `Message: ${data.message}, `;
+  if (data.context) {
+    line += `Context: ${JSON.stringify(data.context)}, `;
+  }
+  log('syslog', line);
+}
 
 const inversLogLines = (logs) => {
   const lines = logs.split('\n');
@@ -57,4 +78,5 @@ module.exports = {
   getLogs,
   log,
   logWatering,
+  syslog,
 };

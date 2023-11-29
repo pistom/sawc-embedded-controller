@@ -15,6 +15,14 @@ devices:
     type: MCP23017
     address: 39                    # I2C address of the device
     outputs:
+      # '0': 
+        # pin: 0                   # Pin number on the device (mandatory)
+        # image: 01.jpg            # Image name in plants directory
+        # ratio: 2                 # Mililiters per second
+        # name: Zamiokulkas
+        # disabled: false
+        # sync: false              # If true, the plant will be synchronized with online API
+        # onlinePlantsIds: []      # List of plants IDs from online API
       '1':
         pin: 8
       '2':

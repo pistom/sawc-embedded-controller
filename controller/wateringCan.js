@@ -85,15 +85,19 @@ const getRemainingTimes = (queues, device, io) => {
 }
 
 const editOutput = (message, io) => {
-  const { device, output, name, image, defaultVolume, ratio } = message;
+  const { device, output, name, image, defaultVolume, ratio, sync } = message;
   const config = require('../utils/filesUtils.js').getConfigFile();
+  const needToSync = config.devices[device].outputs[output].sync || sync;
   name ? (config.devices[device].outputs[output].name = name) : delete config.devices[device].outputs[output].name;
   image ? (config.devices[device].outputs[output].image = image) : delete config.devices[device].outputs[output].image;
   defaultVolume ? (config.devices[device].outputs[output].defaultVolume = defaultVolume) : delete config.devices[device].outputs[output].defaultVolume;
   ratio ? (config.devices[device].outputs[output].ratio = ratio) : delete config.devices[device].outputs[output].ratio;
+  sync ? (config.devices[device].outputs[output].sync = sync) : delete config.devices[device].outputs[output].sync;
+  sync === false && config.devices[device].outputs[output]?.onlinePlantsIds && delete config.devices[device].outputs[output].onlinePlantsIds;
   require('../utils/filesUtils.js').saveConfigFile(config);
   require('../config.js').getConfig();
   io.emit('message', { status: 'configEdited', config})
+  needToSync && io.emit('message', { status: 'needToSyncOutputWithOnlineApi', deviceId: device, outputId: output, data: config.devices[device].outputs[output]})
 }
 
 const editDevice = (message, io) => {
@@ -106,7 +110,8 @@ const editDevice = (message, io) => {
   calibrateDuration ? (config.devices[device].settings.calibrateDuration = calibrateDuration) : delete config.devices[device].settings.calibrateDuration;
   require('../utils/filesUtils.js').saveConfigFile(config);
   require('../config.js').getConfig();
-  io.emit('message', { status: 'configEdited', config})
+  io.emit('message', { status: 'configEdited', config});
+  io.emit('message', { status: 'needToSyncDevicesWithOnlineApi', devices: config.devices});
 }
 
 const editDeviceOutput = (message, io) => {
@@ -117,6 +122,7 @@ const editDeviceOutput = (message, io) => {
   require('../utils/filesUtils.js').saveConfigFile(config);
   require('../config.js').getConfig();
   io.emit('message', { status: 'configOutputEdited', config, device, output})
+  io.emit('message', { status: 'needToSyncDevicesWithOnlineApi', devices: config.devices});
 }
 
 const calibrate = async (queues, message, io) => {

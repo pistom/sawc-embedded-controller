@@ -112,25 +112,6 @@ const getMessagesToProcessFromOnlineApi = async () => {
   return await requestToOnlineApi('/api/sawc/messages/process');
 }
 
-const syncDevicesWithOnlineApi = async (devices) => {
-  const response = await requestToOnlineApi(`/api/sawc/devices`, 'POST', devices);
-  if (response.success && response.createdPlants) {
-    require('./config.js').getConfig();
-    let configFileEdited = false;
-    const config = require('./config.js').config;
-    Object.keys(response.createdPlants).forEach(deviceId => {
-      Object.keys(response.createdPlants[deviceId]).forEach(outputId => {
-        config.devices[deviceId].outputs[outputId].onlinePlantsIds = [response.createdPlants[deviceId][outputId][0]];
-        config.devices[deviceId].outputs[outputId].name = response.createdPlants[deviceId][outputId][1];
-        configFileEdited = true;
-      });
-    });
-    require('./config.js').saveConfig(config);
-    require('./config.js').getConfig();
-    configFileEdited && socket.emit('message', { action: 'configFileEdited'});
-  }
-}
-
 // Plants watering messages
 socket.on("message", async (data) => {
   if (data.type === 'online') {
@@ -154,11 +135,53 @@ socket.on("message", async (data) => {
   }
 });
 
+const syncDevicesWithOnlineApi = async (devices) => {
+  try {
+    const response = await requestToOnlineApi(`/api/sawc/devices`, 'POST', devices);
+    if (response.success && response.createdPlants) {
+      require('./config.js').getConfig();
+      let configFileEdited = false;
+      const config = require('./config.js').config;
+      Object.keys(response.createdPlants).forEach(deviceId => {
+        Object.keys(response.createdPlants[deviceId]).forEach(outputId => {
+          config.devices[deviceId].outputs[outputId].onlinePlantsIds = [response.createdPlants[deviceId][outputId][0]];
+          config.devices[deviceId].outputs[outputId].name = response.createdPlants[deviceId][outputId][1];
+          configFileEdited = true;
+        });
+      });
+      require('./config.js').saveConfig(config);
+      require('./config.js').getConfig();
+      configFileEdited && socket.emit('message', { action: 'configFileEdited'});
+    }
+  } catch (err) {
+    socket.emit('message', { action: 'syslog', level: 'error', message: `Error while syncing devices with online api: ${err.message}`, context: err.stack })
+  }
+}
+
+const syncOutputsWithOnlineApi = async (deviceId, outputId, data) => {
+  try {
+    const response = await requestToOnlineApi(`/api/sawc/devices/${deviceId}/outputs/${outputId}`, 'POST', data);
+    if (response.success && response.createdPlant) {
+      require('./config.js').getConfig();
+      const config = require('./config.js').config;
+      config.devices[deviceId].outputs[outputId].onlinePlantsIds = [response.createdPlant[0]];
+      config.devices[deviceId].outputs[outputId].name = response.createdPlant[1];
+      require('./config.js').saveConfig(config);
+      require('./config.js').getConfig();
+      socket.emit('message', { action: 'configFileEdited'});
+    }
+  } catch (err) {
+    socket.emit('message', { action: 'syslog', level: 'error', message: `Error while syncing output with online api: ${err.message}`, context: err.stack })
+  }
+}
+
 socket.on("message", async (data) => {
   switch (data.status) {
-    case "configEdited":
-    case "configOutputEdited":
-      await syncDevicesWithOnlineApi(data.config.devices);
+    case "needToSyncDevicesWithOnlineApi":
+      await syncDevicesWithOnlineApi(data.devices);
+      break;
+    case "needToSyncOutputWithOnlineApi":
+      await syncOutputsWithOnlineApi(data.deviceId, data.outputId, data.data);
       break;
   }
 });

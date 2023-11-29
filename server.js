@@ -76,6 +76,9 @@ const initServer = async () => {
           case 'configFileEdited':
             require('./controller/wateringCan.js').configFileEdited(io);
             break;
+          case 'syslog':
+            require('./controller/logs.js').syslog(message);
+            break;
         }
         cb && cb(message.action);
       });
