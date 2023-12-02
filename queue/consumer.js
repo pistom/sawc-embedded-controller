@@ -18,7 +18,7 @@ class Consumer {
     while (queue.queue.length > 0) {
       const { output, duration, startCallback, endCallback, dateTime, type, context } = queue.queue[0];
       queue.queue[0].status = 'running';
-      await startCallback(device, output);
+      startCallback(device, output);
       const message = { device, output, status: 'watering', duration, dateTime, type, context }
       io.emit('message', message);
       logWatering(message);

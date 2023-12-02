@@ -101,6 +101,7 @@ const requestToOnlineApi = async (endpoint, type = 'GET', body = null) => {
       if (data.status === "404") {
         apiStatus = data.detail;
       }
+      socket.emit('message', { action: 'syslog', level: 'error', message: `Error while requesting online api: ${data.message}`, context: data.detail });
     }
   } catch (err) {
     apiStatus = 'offline';
@@ -123,12 +124,18 @@ socket.on("message", async (data) => {
       duration: data.duration,
       status: data.status,
       sentToController: data.dateTime,
+      updated: new Date(),
     }
     switch (data.status) {
       case "watering":
         await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'POST', { content });
         break;
       case "done":
+        await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'POST', { status: 'PROCESSED', content });
+        break;
+      case "stopped":
+      case "aborted":
+      case "stopError":
         await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'POST', { status: 'PROCESSED', content });
         break;
     }
@@ -138,7 +145,7 @@ socket.on("message", async (data) => {
 const syncDevicesWithOnlineApi = async (devices) => {
   try {
     const response = await requestToOnlineApi(`/api/sawc/devices`, 'POST', devices);
-    if (response.success && response.createdPlants) {
+    if (response?.success && response.createdPlants) {
       require('./config.js').getConfig();
       let configFileEdited = false;
       const config = require('./config.js').config;
@@ -152,7 +159,7 @@ const syncDevicesWithOnlineApi = async (devices) => {
       require('./config.js').saveConfig(config);
       require('./config.js').getConfig();
       configFileEdited && socket.emit('message', { action: 'configFileEdited'});
-    }
+    } 
   } catch (err) {
     socket.emit('message', { action: 'syslog', level: 'error', message: `Error while syncing devices with online api: ${err.message}`, context: err.stack })
   }
@@ -161,7 +168,7 @@ const syncDevicesWithOnlineApi = async (devices) => {
 const syncOutputsWithOnlineApi = async (deviceId, outputId, data) => {
   try {
     const response = await requestToOnlineApi(`/api/sawc/devices/${deviceId}/outputs/${outputId}`, 'POST', data);
-    if (response.success && response.createdPlant) {
+    if (response?.success && response.createdPlant) {
       require('./config.js').getConfig();
       const config = require('./config.js').config;
       config.devices[deviceId].outputs[outputId].onlinePlantsIds = [response.createdPlant[0]];
@@ -169,7 +176,7 @@ const syncOutputsWithOnlineApi = async (deviceId, outputId, data) => {
       require('./config.js').saveConfig(config);
       require('./config.js').getConfig();
       socket.emit('message', { action: 'configFileEdited'});
-    }
+    } 
   } catch (err) {
     socket.emit('message', { action: 'syslog', level: 'error', message: `Error while syncing output with online api: ${err.message}`, context: err.stack })
   }
@@ -218,11 +225,11 @@ const init = async () => {
 
 setInterval(async () => {
   await init();
-}, 3000);
+}, 2500);
 
 setInterval(async () => {
   socket.emit('message', { action: 'heartbeat', process: 'workeronline', memory: getMemoryUsage(), onlineApiStatus: apiStatus });
-}, 5000);
+}, 8000);
 
 init();
 

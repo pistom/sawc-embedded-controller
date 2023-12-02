@@ -38,10 +38,10 @@ const startWater = async (queues, message, io) => {
  */
 const stopWater = async (queues, message, io) => {
   const { logWatering } = require('../utils/logsUtils');
-  const { device, output } = message;
+  const { device, output, type, context } = message;
   const messageContent = { device, output, status: '', message: '' };
   if (!queues[device]) {
-    messageContent.status = 'error';
+    messageContent.status = 'stopError';
     messageContent.message = 'No queue for device';
   } else {
     const queueElement = queues[device].unqueue(output);
@@ -60,7 +60,7 @@ const stopWater = async (queues, message, io) => {
       }
       logWatering({ ...messageContent })
     } else {
-      messageContent.status = 'error';
+      messageContent.status = 'stopError';
       messageContent.message = 'No queue element for output';
     }
     if (queues[device].queue.length === 0) {
@@ -68,6 +68,8 @@ const stopWater = async (queues, message, io) => {
     }
     io.emit('message', { status: 'remainingTimes', device, remainingTimes: queues[device].getRemainingTimes() });
   }
+  type && (messageContent.type = type);
+  context && (messageContent.context = context);
   io.emit('message', messageContent);
 }
 
@@ -142,13 +144,6 @@ const calibrate = async (queues, message, io) => {
   await startPump(device);
   await outputOn(device, output);
   io.emit('message', { status: 'calibratingWaterStarted', duration, device, output });
-  // await calibrating.calibrateSleep.promise
-  // await stopPump(device);
-  // if (calibrating.isCalibrating) {
-  //   await outputOff(device, output);
-  //   io.emit('message', { status: 'calibratingWaterStopped', duration, device, output });
-  //   calibrating.isCalibrating = false;
-  // }
   calibrating.calibrateSleep.promise.then(async () => {
     await stopPump(device);
     await outputOff(device, output);
@@ -170,7 +165,7 @@ const stopCalibrating = async (message, io) => {
 }
 
 const calculateRatio = (message, io) => {
-  const { device, output, volume } = message;
+  const { device, output, volume, date } = message;
   const duration = require('../config.js').config.devices[device].settings.calibrateDuration;
   const ratio = Number((volume / duration).toFixed(2));
   io.emit('message', { status: 'ratioCalculated', ratio, device, output });

@@ -60,7 +60,7 @@ describe('stopWater', () => {
     const message = { device: 'MODULE_01', output: '1' };
     await stopWater(queues, message, ioMock);
     await jest.runAllTimers();
-    expect(ioMock.emit).toHaveBeenCalledWith('message', {device: 'MODULE_01', output: '1', status: 'error', message: 'No queue for device' });
+    expect(ioMock.emit).toHaveBeenCalledWith('message', {device: 'MODULE_01', output: '1', status: 'stopError', message: 'No queue for device' });
   });
 });
 
