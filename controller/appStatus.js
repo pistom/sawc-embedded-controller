@@ -5,17 +5,19 @@ let workingSince = new Date();
 const heartbeat = (message, io) => {
   if (message.process === 'worker') {
     workerLastHeartbeat = new Date();
-  } else if (message.process === 'workerOnline') {
+  } else if (message.process === 'workeronline') {
     workerOnlineLastHeartbeat = new Date();
   }
   io.emit('message', message);
+  return [workerLastHeartbeat, workerOnlineLastHeartbeat];
 }
 
 const getAppStatus = (message, io) => {
-  io.emit('message', {
+  const { type, context } = message;
+  const messageContent = {
     status: 'appStatus',
     controller: {
-      workingSince,
+      workingSince: workingSince,
       memoryUsage: `${Math.round((process.memoryUsage().heapUsed / 1024 / 1024) * 100) / 100} MB` 
     },
     worker: {
@@ -24,7 +26,11 @@ const getAppStatus = (message, io) => {
     workerOnline: {
       lastHeartbeat: workerOnlineLastHeartbeat,
     }
-  });
+  }
+  type && (messageContent.type = type);
+  context && (messageContent.context = context);
+
+  io.emit('message', messageContent);
 }
 
 module.exports = {

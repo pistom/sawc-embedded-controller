@@ -39,7 +39,7 @@ const startWater = async (queues, message, io) => {
 const stopWater = async (queues, message, io) => {
   const { logWatering } = require('../utils/logsUtils');
   const { device, output, type, context } = message;
-  const messageContent = { device, output, status: '', message: '' };
+  const messageContent = { device, output, status: '', message: '', type, context };
   if (!queues[device]) {
     messageContent.status = 'stopError';
     messageContent.message = 'No queue for device';
