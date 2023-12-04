@@ -119,13 +119,13 @@ socket.on("message", async (data) => {
     const content = {
       action: data.context.action,
       status: data.status,
-      sentToController: data.dateTime,
       updated: new Date(),
     }
     if (['START_WATER', 'STOP_WATER'].includes(data.context.onlineMessageAction)) {
       content.device = data.device;
       content.output = data.output;
       content.volume = data.context.volume;
+      content.sentToController = data.dateTime;
       content.duration = data.duration;
     }
     switch (data.status) {
@@ -146,6 +146,9 @@ socket.on("message", async (data) => {
           worker: data.worker,
           workerOnline: data.workerOnline,
         }
+        await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'POST', { status: 'PROCESSED', content });
+        break;
+      case "configEdited":
         await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'POST', { status: 'PROCESSED', content });
         break;
     }

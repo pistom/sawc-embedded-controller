@@ -87,18 +87,38 @@ const getRemainingTimes = (queues, device, io) => {
 }
 
 const editOutput = (message, io) => {
-  const { device, output, name, image, defaultVolume, ratio, sync } = message;
+  const { device, output, name, image, defaultVolume, ratio, sync, disabled, onlinePlantsIds, type, context } = message;
   const config = require('../utils/filesUtils.js').getConfigFile();
   const needToSync = config.devices[device].outputs[output].sync || sync;
-  name ? (config.devices[device].outputs[output].name = name) : delete config.devices[device].outputs[output].name;
-  image ? (config.devices[device].outputs[output].image = image) : delete config.devices[device].outputs[output].image;
-  defaultVolume ? (config.devices[device].outputs[output].defaultVolume = defaultVolume) : delete config.devices[device].outputs[output].defaultVolume;
-  ratio ? (config.devices[device].outputs[output].ratio = ratio) : delete config.devices[device].outputs[output].ratio;
-  sync ? (config.devices[device].outputs[output].sync = sync) : delete config.devices[device].outputs[output].sync;
+
+  name !== undefined && (config.devices[device].outputs[output].name = name);
+  name === '' && config.devices[device].outputs[output]?.name && delete config.devices[device].outputs[output].name;
+
+  image !== undefined && (config.devices[device].outputs[output].image = image);
+  image === '' && config.devices[device].outputs[output]?.image && delete config.devices[device].outputs[output].image;
+
+  defaultVolume !== undefined && (config.devices[device].outputs[output].defaultVolume = defaultVolume);
+  defaultVolume === 0 && config.devices[device].outputs[output]?.defaultVolume && delete config.devices[device].outputs[output].defaultVolume;
+
+  ratio !== undefined && (config.devices[device].outputs[output].ratio = ratio);
+  ratio === 0 && config.devices[device].outputs[output]?.ratio && delete config.devices[device].outputs[output].ratio;
+
+  disabled !== undefined && (config.devices[device].outputs[output].disabled = disabled); 
+
+  sync !== undefined && (config.devices[device].outputs[output].sync = sync)
   sync === false && config.devices[device].outputs[output]?.onlinePlantsIds && delete config.devices[device].outputs[output].onlinePlantsIds;
+
+  onlinePlantsIds !== undefined && (config.devices[device].outputs[output].onlinePlantsIds = onlinePlantsIds);
+  onlinePlantsIds?.length === 0 && config.devices[device].outputs[output]?.onlinePlantsIds && delete config.devices[device].outputs[output].onlinePlantsIds;
+
   require('../utils/filesUtils.js').saveConfigFile(config);
   require('../config.js').getConfig();
-  io.emit('message', { status: 'configEdited', config})
+
+  const messageContent = { config };
+  type && (messageContent.type = type);
+  context && (messageContent.context = context);
+
+  io.emit('message', { status: 'configEdited', ...messageContent})
   needToSync && io.emit('message', { status: 'needToSyncOutputWithOnlineApi', deviceId: device, outputId: output, data: config.devices[device].outputs[output]})
 }
 
