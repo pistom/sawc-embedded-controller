@@ -92,7 +92,7 @@ const editOutput = (message, io) => {
   const needToSync = config.devices[device].outputs[output].sync || sync;
 
   name !== undefined && (config.devices[device].outputs[output].name = name);
-  name === '' && config.devices[device].outputs[output]?.name && delete config.devices[device].outputs[output].name;
+  name === '' && config.devices[device].outputs[output]?.name === '' && delete config.devices[device].outputs[output].name;
 
   image !== undefined && (config.devices[device].outputs[output].image = image);
   image === '' && config.devices[device].outputs[output]?.image && delete config.devices[device].outputs[output].image;
