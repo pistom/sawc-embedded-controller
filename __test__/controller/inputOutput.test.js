@@ -2,7 +2,7 @@ const { devicesMock } = require('../../__mocks__/devicesMock');
 const { configMock } = require('../../__mocks__/configMock');
 const { outputOn, outputOff } = require('../../controller/inputOutput');
 
-beforeEach(async() => {
+beforeEach(async () => {
   jest.mock('../../emulator/mock');
   require('../../emulator/mock').MCP23x17 = jest.fn().mockImplementation(() => {
     return {
@@ -24,18 +24,20 @@ beforeEach(async() => {
 });
 
 describe('inputOutput', () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     jest.mock('../../devices');
     require('../../devices').devices = devicesMock;
     jest.mock('../../config');
     require('../../config').config = configMock;
+    jest.mock('../../queue/queue.js');
+    require('../../queue/queue').queues = {'MODULE_01': {queue: [{duration: 3}]}}
     delete devicesMock['MODULE_01'];
   });
 
   it('should turn on output', async () => {
     await outputOn('MODULE_01', '1');
-    expect(devicesMock['MODULE_01'].outputs['1'].write).toHaveBeenCalledWith(0);
+    expect(devicesMock['MODULE_01'].outputs['1'].write).toHaveBeenCalledWith(0, 3);
   });
 
   it('should turn off output', async () => {

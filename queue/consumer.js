@@ -24,6 +24,10 @@ class Consumer {
       logWatering(message);
       queue.queue[0].sleep = sleep(duration);
       await queue.queue[0].sleep.promise;
+      let error = false;
+      if (queue.queue[0].error) {
+        error = queue.queue[0].error;
+      }
       if (queue.queue[0]?.output === output) {
         if(queue.queue[1]) {
           await endCallback(device, output);
@@ -33,8 +37,10 @@ class Consumer {
           }, delayOff);
         }
         queue.shift();
-        io.emit('message', { ...message, status: 'done'});
-        logWatering({ ...message, status: 'done'});
+        error && (message.context = error.toString());
+        const status = error ? 'error' : 'done';
+        io.emit('message', { ...message, status});
+        logWatering({ ...message, status});
       }
     }
     await finishCallback(device);

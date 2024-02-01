@@ -43,7 +43,7 @@ function MCP23x17(device) {
       writeStatus(device, pin, value, mode === MODE_OUTPUT ? 'out' : 'in');
       return new Promise((resolve, reject) => {
         resolve({
-          write: function (value) {
+          write: function (value, duration) {
             writeStatus(device, pin, value, mode === MODE_OUTPUT ? 'out' : 'in');
           }
         });

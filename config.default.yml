@@ -4,6 +4,9 @@ preferences:
   onlineApiUrl: ~                  # URL of the online API.
   onlineApiUser: ~                 # Online API user.
   onlineApiPassword: ~             # Online API password.
+  wateringDeviceTypes:
+    - mcp23x17
+    - network
 devices:
   MODULE_01:
     name: Terrace
@@ -12,7 +15,7 @@ devices:
       defaultRatio: 2              # Mililiters per second
       maxVolumePerOutput: 1000     # Max volume of water per output
       calibrateDuration: 60        # Duration of calibration in seconds
-    type: MCP23017
+    type: mcp23x17
     address: 39                    # I2C address of the device
     outputs:
       # '0': 

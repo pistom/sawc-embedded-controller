@@ -6,6 +6,7 @@ const configMock = {
         defaultRatio: .85,
         calibrateDuration: 10,
       },
+      type: "mcp23x17",
       outputs: {
         '1': {
           pin: 8,
