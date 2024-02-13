@@ -19,15 +19,31 @@ class NetworkOutput {
   }
 
   async outputOn(duration) {
-    await sleep(1).promise;
-    // TODO: Request to network module
-    console.dir(`Output ${this.output} is ON${duration ? ` for ${duration} seconds` : ''}`)
+    const response = await this.requestDevice('on', duration);
+    // TODO: handle not ok case
+    // if (!response.ok)
+    console.dir(`Output ${this.output} is ON${duration ? ` for ${duration} seconds` : ''}`);
   }
 
   async outputOff() {
-    await sleep(1).promise;
-    // TODO: Request to network module
-    console.dir(`Output ${this.output} is OFF`)
+    const response = await this.requestDevice('off');
+    // TODO: handle not ok case
+    // if (!response.ok)
+    console.dir(`Output ${this.output} is OFF`);
+  }
+
+  async requestDevice(type, duration) {
+    const address = this.deviceConfig.address;
+    const token = this.deviceConfig.token; 
+    let url = `${address}/${type}?${this.output === 'pump' ? 'pump' : `output=${this.output}`}&token=${token}`;
+    if (duration) {
+      url += `&duration=${duration}`;
+    }
+    return fetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
   }
 }
 

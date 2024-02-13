@@ -25,7 +25,7 @@ class Consumer {
       queue.queue[0].sleep = sleep(duration);
       await queue.queue[0].sleep.promise;
       let error = false;
-      if (queue.queue[0].error) {
+      if (queue.queue[0]?.error) {
         error = queue.queue[0].error;
       }
       if (queue.queue[0]?.output === output) {
