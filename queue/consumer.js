@@ -1,4 +1,5 @@
 const { sleep } = require('../utils/sleep');
+const { clearQueue } = require('./queue');
 
 class Consumer {
   constructor(queues, device, io) {
@@ -18,16 +19,21 @@ class Consumer {
     while (queue.queue.length > 0) {
       const { output, duration, startCallback, endCallback, dateTime, type, context } = queue.queue[0];
       queue.queue[0].status = 'running';
-      await startCallback(device, output);
       const message = { device, output, status: 'watering', duration, dateTime, type, context }
+      try {
+        await startCallback(device, output);
+      } catch (error) {
+        message.status = 'error';
+        message.context = error;
+        io.emit('message', message);
+        logWatering(message);
+        queue.shift();
+        continue;
+      }
       io.emit('message', message);
       logWatering(message);
       queue.queue[0].sleep = sleep(duration);
       await queue.queue[0].sleep.promise;
-      let error = false;
-      if (queue.queue[0]?.error) {
-        error = queue.queue[0].error;
-      }
       if (queue.queue[0]?.output === output) {
         if(queue.queue[1]) {
           await endCallback(device, output);
@@ -37,13 +43,15 @@ class Consumer {
           }, delayOff);
         }
         queue.shift();
-        error && (message.context = error.toString());
-        const status = error ? 'error' : 'done';
-        io.emit('message', { ...message, status});
-        logWatering({ ...message, status});
+        io.emit('message', { ...message, status: 'done'});
+        logWatering({ ...message, status: 'done'});
       }
     }
-    await finishCallback(device);
+    try {
+      await finishCallback(device);
+    } catch (error) {
+      console.error(error);
+    }
     delete queues[device];
   }
 }

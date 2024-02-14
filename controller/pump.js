@@ -11,9 +11,7 @@ const startPump = async (device) => {
   setTimeout(async () => {
     try {
       await devices[device]?.outputs['pump'].write(0);
-    } catch (e) {
-      await clearQueue(device, e);
-    }
+    } catch (e) {}
   }, delay);
 }
 
@@ -22,9 +20,7 @@ const stopPump = async (device) => {
   if (require('../config').config.devices[device].outputs['pump'].disabled) return;
   try {
     await devices[device]?.outputs['pump'].write(1);
-  } catch (e) {
-    await clearQueue(device, e);
-  }
+  } catch (e) {}
 }
 
 module.exports = {

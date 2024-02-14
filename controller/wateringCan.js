@@ -49,7 +49,7 @@ const stopWater = async (queues, message, io) => {
     if (queueElement) {
       // Checki if the output is currently set to on
       if (queueElement.status === 'running') {
-        queueElement.sleep.resume();
+        queueElement.sleep?.resume();
         const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
         setTimeout(async () => {
           queueElement.endCallback(device, output);
