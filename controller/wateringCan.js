@@ -26,7 +26,7 @@ const startWater = async (queues, message, io) => {
   io.emit('message', { status: 'remainingTimes', device, remainingTimes: queue.getRemainingTimes() });
   if (!queue.consumer) {
     queue.consumer = new Consumer(queues, device, io);
-    queue.consumer.consume(stopPump);
+    await queue.consumer.consume(stopPump);
   }
 }
 

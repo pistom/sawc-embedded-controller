@@ -27,7 +27,8 @@ describe('startWater', () => {
   test('adds output to queue and starts consumer if not running', async () => {
     queues = {};
     const message = { device: 'MODULE_01', output: '1', volume: 10 };
-    await startWater(queues, message, ioMock);
+    startWater(queues, message, ioMock);
+    await jest.runAllTimers();
     expect(queues['MODULE_01']).toBeInstanceOf(Queue);
     expect(queues['MODULE_01'].queue[0].duration).toBe(20);
     expect(queues['MODULE_01'].consumer).toBeInstanceOf(Consumer);
@@ -38,7 +39,7 @@ describe('startWater', () => {
     calibratingModule.isCalibrating = true;
     queues = {};
     const message = { device: 'MODULE_01', output: '1', volume: 10 };
-    await startWater(queues, message, ioMock);
+    startWater(queues, message, ioMock);
     expect(ioMock.emit).toHaveBeenCalledWith('message', { status: 'calibratingError', device: 'MODULE_01', output: '1', message: 'Cannot start water while calibrating' });
     jest.resetModules();
   });
@@ -49,9 +50,12 @@ describe('stopWater', () => {
     queues = {};
     const message1 = { device: 'MODULE_01', output: '1', volume: 10 };
     const message2 = { device: 'MODULE_01', output: '2', volume: 10 };
-    await startWater(queues, message1, ioMock);
-    await startWater(queues, message2, ioMock);
-    await stopWater(queues, message1, ioMock);
+    startWater(queues, message1, ioMock);
+    await jest.runAllTimers();
+    startWater(queues, message2, ioMock);
+    await jest.runAllTimers();
+    stopWater(queues, message1, ioMock);
+    await jest.runAllTimers();
     expect(queues['MODULE_01'].queue.length).toBe(1);
   });
 
@@ -106,7 +110,8 @@ describe('calibrate', () => {
     const calibrateMessage = { device: 'MODULE_01', output: '1' };
     const calibratingModule = require('../../controller/calibrating');
     calibratingModule.isCalibrating = true;
-    await calibrate(queues, calibrateMessage, ioMock);
+    calibrate(queues, calibrateMessage, ioMock);
+    await jest.runAllTimers();
     expect(ioMock.emit).toHaveBeenCalledWith('message', { status: 'calibratingError', device: 'MODULE_01', output: '1', message: 'Already calibrating' });
     jest.resetModules();
   });
@@ -115,8 +120,9 @@ describe('calibrate', () => {
     ioMock = require('../../__mocks__/ioMock');
     const calibrateMessage = { device: 'MODULE_01', output: '1' };
     queues = {};
-    await startWater(queues, calibrateMessage, ioMock);
-    await calibrate(queues, calibrateMessage, ioMock);
+    startWater(queues, calibrateMessage, ioMock);
+    await jest.runAllTimers();
+    calibrate(queues, calibrateMessage, ioMock);
     expect(ioMock.emit).toHaveBeenCalledWith('message', { status: 'calibratingError', device: 'MODULE_01', output: '1', message: 'Cannot calibrate while queue is running' });
     jest.resetModules();
   });
@@ -127,19 +133,20 @@ describe('getRemainingTimes', () => {
     queues = {};
     const message1 = { device: 'MODULE_01', output: '1', volume: 10 };
     const message2 = { device: 'MODULE_01', output: '2', volume: 10 };
-    await startWater(queues, message1, ioMock);
-    await startWater(queues, message2, ioMock);
+    startWater(queues, message1, ioMock);
+    await jest.runAllTimers();
+    startWater(queues, message2, ioMock);
+    await jest.runAllTimers();
     const fileUtils = require('../../utils/filesUtils');
     fileUtils.getConfigFile = jest.fn().mockImplementation(() => {
       return configMock;
     });
-    jest.useFakeTimers();
     const remainingTimes = getRemainingTimes(queues, 'MODULE_01', ioMock);
     expect(ioMock.emit).toHaveBeenCalled();
     expect(remainingTimes['1']["wateringIn"]).toBeLessThanOrEqual(0);
     expect(remainingTimes['2']["wateringIn"]).toBeLessThanOrEqual(20);
     expect(remainingTimes['2']["wateringIn"]).toBeGreaterThan(10);
-  });
+  }, 2000);
 });
 
 describe('Consumer', () => {
@@ -148,15 +155,19 @@ describe('Consumer', () => {
     const message1 = { device: 'MODULE_01', output: '1', volume: 5 };
     const message2 = { device: 'MODULE_01', output: '2', volume: 5 };
     const message3 = { device: 'MODULE_01', output: '3', volume: 5 };
-    await startWater(queues, message1, ioMock);
-    await startWater(queues, message2, ioMock);
-    await startWater(queues, message3, ioMock);
+    startWater(queues, message1, ioMock);
+    await jest.runAllTimers();
+    startWater(queues, message2, ioMock);
+    await jest.runAllTimers();
+    startWater(queues, message3, ioMock);
+    await jest.runAllTimers();
     expect(queues['MODULE_01'].queue.length).toBe(3);
     expect(queues['MODULE_01'].consumer).toBeInstanceOf(Consumer);
     expect(queues['MODULE_01'].queue[0].status).toBe('running');
     await jest.runAllTimers();
     await jest.runAllTimers();
     expect(queues['MODULE_01'].queue.length).toBe(2);
+    await jest.runAllTimers();
     await jest.runAllTimers();
     await jest.runAllTimers();
     expect(queues['MODULE_01'].queue.length).toBe(1);

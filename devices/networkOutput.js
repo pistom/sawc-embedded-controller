@@ -19,17 +19,25 @@ class NetworkOutput {
   }
 
   async outputOn(duration) {
-    const response = await this.requestDevice('on', duration);
-    // TODO: handle not ok case
-    // if (!response.ok)
-    console.dir(`Output ${this.output} is ON${duration ? ` for ${duration} seconds` : ''}`);
+    try {
+      const response = await this.requestDevice('on', duration);
+      console.dir(`Output ${this.output} is ON${duration ? ` for ${duration} seconds` : ''}`);
+      // TODO: handle not ok case
+      // if (!response.ok)
+    } catch (e) {
+      console.error(e.cause)
+    }
   }
 
   async outputOff() {
-    const response = await this.requestDevice('off');
-    // TODO: handle not ok case
-    // if (!response.ok)
-    console.dir(`Output ${this.output} is OFF`);
+    try {
+      const response = await this.requestDevice('off');
+      console.dir(`Output ${this.output} is OFF`);
+      // TODO: handle not ok case
+      // if (!response.ok)
+    } catch (e) {
+      console.error(e.cause);
+    }
   }
 
   async requestDevice(type, duration) {

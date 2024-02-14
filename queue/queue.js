@@ -23,7 +23,7 @@ class Queue {
     let elapsedTime = 0;
     for (const item of this.queue) {
       if (item.status === 'running') {
-        elapsedTime = item.sleep.elapsedTime()
+        elapsedTime = item.sleep?.elapsedTime()
       }
       globalTime += item.duration;
       outputs[item.output] = {
