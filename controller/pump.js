@@ -1,5 +1,3 @@
-const clearQueue = require('../queue/queue').clearQueue;
-
 const startPump = async (device) => {
   const deviceType = require('../config').config.devices[device].type;
   const delay = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOn || 0;

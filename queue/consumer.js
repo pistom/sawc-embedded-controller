@@ -1,5 +1,4 @@
 const { sleep } = require('../utils/sleep');
-const { clearQueue } = require('./queue');
 
 class Consumer {
   constructor(queues, device, io) {
@@ -22,6 +21,22 @@ class Consumer {
       const message = { device, output, status: 'watering', duration, dateTime, type, context }
       try {
         await startCallback(device, output);
+        io.emit('message', message);
+        logWatering(message);
+        queue.queue[0].sleep = sleep(duration);
+        await queue.queue[0].sleep.promise;
+        if (queue.queue[0]?.output === output) {
+          if(queue.queue[1]) {
+            await endCallback(device, output);
+          } else {
+            setTimeout(async () => {
+              await endCallback(device, output);
+            }, delayOff);
+          }
+          queue.shift();
+          io.emit('message', { ...message, status: 'done'});
+          logWatering({ ...message, status: 'done'});
+        }
       } catch (error) {
         message.status = 'error';
         message.context = error;
@@ -29,22 +44,6 @@ class Consumer {
         logWatering(message);
         queue.shift();
         continue;
-      }
-      io.emit('message', message);
-      logWatering(message);
-      queue.queue[0].sleep = sleep(duration);
-      await queue.queue[0].sleep.promise;
-      if (queue.queue[0]?.output === output) {
-        if(queue.queue[1]) {
-          await endCallback(device, output);
-        } else {
-          setTimeout(async () => {
-            await endCallback(device, output);
-          }, delayOff);
-        }
-        queue.shift();
-        io.emit('message', { ...message, status: 'done'});
-        logWatering({ ...message, status: 'done'});
       }
     }
     try {

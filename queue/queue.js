@@ -68,18 +68,7 @@ class Queue {
   }
 }
 
-const clearQueue = async (device, error) => {
-  const queues = require('../queue/queue').queues;
-  const queue = queues[device];
-  queue?.io && queue.io.emit('message', { status: 'Network module ERROR'});
-  await sleep(0).promise;
-  queue?.queue[0] && (queue.queue[0].error = error) && queue.queue[0].sleep?.resume();
-  queue && delete queue.consumer;
-  queues[device] && delete queues[device];
-}
-
 module.exports = {
   queues,
   Queue,
-  clearQueue,
 }

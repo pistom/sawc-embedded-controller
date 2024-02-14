@@ -18,7 +18,11 @@ const startWater = async (queues, message, io) => {
   }
   const { device, output, volume, type, dateTime, context } = message;
   if (!queues[device]) {
-    await startPump(device);
+    try {
+      await startPump(device);
+    } catch (e) {
+      console.error(e)
+    }
     queues[device] = new Queue(device, io);
   }
   const queue = queues[device];
@@ -52,7 +56,11 @@ const stopWater = async (queues, message, io) => {
         queueElement.sleep?.resume();
         const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
         setTimeout(async () => {
-          queueElement.endCallback(device, output);
+          try {
+            queueElement.endCallback(device, output);
+          } catch (e) {
+            console.error('yoyyo')
+          }
         }, delayOff);
         messageContent.status = 'stopped';
       } else {
@@ -64,7 +72,11 @@ const stopWater = async (queues, message, io) => {
       messageContent.message = 'No queue element for output';
     }
     if (queues[device].queue.length === 0) {
-      stopPump(device);
+      try {
+        stopPump(device);
+      } catch(e) {
+        console.error(e)
+      }
     }
     io.emit('message', { status: 'remainingTimes', device, remainingTimes: queues[device].getRemainingTimes() });
   }
