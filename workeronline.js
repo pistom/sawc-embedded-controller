@@ -121,13 +121,19 @@ socket.on("message", async (data) => {
       status: data.status,
       updated: new Date(),
     }
-    if (['START_WATER', 'STOP_WATER'].includes(data.context.onlineMessageAction)) {
+    if (
+      ['START_WATER', 'STOP_WATER'].includes(data.context.onlineMessageAction)
+    ) {
       content.device = data.device;
       content.output = data.output;
       content.volume = data.context.volume;
       content.sentToController = data.dateTime;
       content.duration = data.duration;
     }
+    // Network module can not be reach
+    if (data.context.errno === -113) {
+      content.errno = data.context.errno;
+    } 
     switch (data.status) {
       case "watering":
         await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'POST', { content });
@@ -139,6 +145,9 @@ socket.on("message", async (data) => {
       case "aborted":
       case "stopError":
         await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'POST', { status: 'PROCESSED', content });
+        break;
+      case "error":
+        await requestToOnlineApi(`/api/sawc/messages/${data.context.onlineMessageId}`, 'POST', { status: 'PROCESSING', content });
         break;
       case "appStatus":
         content.appStatuses = {
