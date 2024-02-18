@@ -27,7 +27,7 @@ class Consumer {
         await queue.queue[0].sleep.promise;
         if (queue.queue[0]?.output === output) {
           if(queue.queue[1]) {
-            await endCallback(device, output);
+            await endCallback(device, output, queue.queue[1].output);
           } else {
             setTimeout(async () => {
               await endCallback(device, output);

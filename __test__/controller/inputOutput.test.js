@@ -42,6 +42,6 @@ describe('inputOutput', () => {
 
   it('should turn off output', async () => {
     await outputOff('MODULE_01', '1');
-    expect(devicesMock['MODULE_01'].outputs['1'].write).toHaveBeenCalledWith(1);
+    expect(devicesMock['MODULE_01'].outputs['1'].write).toHaveBeenCalledWith(1, null, null);
   });
 });

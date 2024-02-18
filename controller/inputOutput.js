@@ -1,11 +1,11 @@
-const outputOff = async (device, output) => {
+const outputOff = async (device, output, nextOutput = null) => {
   const deviceType = require('../config').config.devices[device].type;
   const devices = require('../devices').devices;
   if (!devices[device]?.outputs[output]) {
     await require(`../devices/${deviceType}`).initOutput(device, output);
   }
   try {
-    await devices[device].outputs[output].write(1);
+    await devices[device].outputs[output].write(1, null, nextOutput);
   } catch (e) {
     console.error(e.cause);
   }

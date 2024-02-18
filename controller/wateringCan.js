@@ -59,7 +59,6 @@ const stopWater = async (queues, message, io) => {
           try {
             queueElement.endCallback(device, output);
           } catch (e) {
-            console.error('yoyyo')
           }
         }, delayOff);
         messageContent.status = 'stopped';
