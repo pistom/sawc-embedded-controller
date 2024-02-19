@@ -3,4 +3,4 @@ let calibrating = {
   calibrateSleep: null,
 };
 
-module.exports = calibrating;
+export { calibrating };

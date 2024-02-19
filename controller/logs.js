@@ -1,8 +1,9 @@
+import { syslog } from '../utils/logsUtils.js';
+
 const syslog = message => {
-  const { syslog } = require('../utils/logsUtils');
   syslog(message);
 }
 
-module.exports = {
+export {
   syslog,
 }

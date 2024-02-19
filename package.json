@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Smart Automatic Watering Controller",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "supervisor server.js",
     "emulator": "node emulator/watcher.js & http-server emulator/ -p 3030 -o",

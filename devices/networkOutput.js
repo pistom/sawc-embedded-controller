@@ -1,5 +1,5 @@
-const fetch = require('node-fetch');
-const https = require('https');
+import fetch from 'node-fetch';
+import https from 'https';
 
 class NetworkOutput {
 
@@ -64,4 +64,4 @@ class NetworkOutput {
   }
 }
 
-module.exports = NetworkOutput;
+export { NetworkOutput };

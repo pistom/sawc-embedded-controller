@@ -1,4 +1,6 @@
-const { sleep } = require('../utils/sleep');
+import { getConfigFile } from '../utils/filesUtils.js';
+import { logWatering } from '../utils/logsUtils.js';
+import { sleep } from '../utils/sleep.js';
 
 class Consumer {
   constructor(queues, device, io) {
@@ -9,12 +11,11 @@ class Consumer {
   }
 
   async consume(finishCallback) {
-    const { logWatering } = require('../utils/logsUtils');
     const queues = this.queues;
     const io = this.io;
     const device = this.device;
     const queue = queues[device];
-    const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
+    const delayOff = getConfigFile().devices[device].outputs['pump'].delayOff || 0;
     while (queue.queue.length > 0) {
       const { output, duration, startCallback, endCallback, dateTime, type, context } = queue.queue[0];
       queue.queue[0].status = 'running';
@@ -58,4 +59,4 @@ class Consumer {
   }
 }
 
-module.exports = { Consumer };
+export { Consumer };

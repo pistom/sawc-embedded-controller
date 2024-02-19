@@ -1,5 +1,6 @@
-const fs = require('fs');
-const yaml = require('js-yaml');
+import * as fs from 'fs';
+
+import yaml from 'js-yaml';
 
 const createDirectoryIfNotExists = (directoryName) => {
   try {
@@ -26,7 +27,6 @@ const deleteFile = fileName => {
 }
 
 const getConfigFile = () => {
-  const fs = require('fs');
   let fileName = './config.yml';
   if (!fs.existsSync('./config.yml')) {
     fileName = './config.default.yml';
@@ -36,7 +36,6 @@ const getConfigFile = () => {
 }
 
 const getScheduleFile = () => {
-  const fs = require('fs');
   let fileName = './schedule.yml';
   if (!fs.existsSync('./schedule.yml')) {
     return {events: []};
@@ -69,7 +68,7 @@ const appendFile = (fileName, content) => {
   fs.appendFileSync(fileName, content + '\n');
 }
 
-module.exports = {
+export {
   getConfigFile,
   getScheduleFile,
   saveConfigFile,

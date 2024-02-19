@@ -29,6 +29,6 @@ const configMock = {
   }
 };
 
-module.exports = {
+export {
   configMock,
 }

@@ -1,6 +1,6 @@
-const { MODE_OUTPUT } = require('@mrvanosh/mcp23x17');
-const fs = require('fs');
-const { createFileIfNotExists } = require('../utils/filesUtils');
+const { MODE_OUTPUT } = import('@mrvanosh/mcp23x17');
+import * as fs from 'fs';
+import { createFileIfNotExists } from '../utils/filesUtils.js';
 const stateFile = './emulator/state.json';
 
 function writeStatus(device, pin, status, dir) {
@@ -52,7 +52,7 @@ function MCP23x17(device) {
   }
 }
 
-module.exports = {
+export {
   Gpio,
   MCP23x17,
 };

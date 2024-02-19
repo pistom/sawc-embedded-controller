@@ -1,5 +1,4 @@
-const { QueueType } = require('../types');
-const { sleep } = require('../utils/sleep');
+import { config } from "../config.js";
 
 const queues = {};
 
@@ -36,7 +35,7 @@ class Queue {
   }
 
   convertToDuration(output, volume) {
-    const device = require('../config').config.devices[this.device]
+    const device = config.devices[this.device]
     if (volume > device.settings.maxVolumePerOutput) {
       volume = device.settings.maxVolumePerOutput;
     }
@@ -68,7 +67,7 @@ class Queue {
   }
 }
 
-module.exports = {
+export {
   queues,
   Queue,
 }

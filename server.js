@@ -1,29 +1,34 @@
-const express = require('express');
-const http = require("http");
-const cors = require('cors');
-const isPi = require('detect-rpi');
-const { Server } = require("socket.io");
-const { WaterMessage } = require('./types');
+import express from 'express';
+import http from "http";
+import cors from 'cors';
+import isPi from 'detect-rpi';
+import { Server } from "socket.io";
+import { config, getConfig, saveConfig } from './config.js';
+import { calculateRatio, calibrate, configFileEdited, editDevice, editDeviceOutput, editOutput, getRemainingTimes, startWater, stopCalibrating, stopWater } from './controller/wateringCan.js';
+import { setGpio } from './devices/gpio.js'
 
 const port = process.env.NODE_ENV === 'test' ? 3301 : 3001;
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {cors: {origin: true}});
-const authMiddleware = require('./middleware/auth.js');
+import authMiddleware from './middleware/auth.js';
 app.use(cors({origin: true}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(authMiddleware);
 
-require('./config.js').getConfig();
-const { queues } = require('./queue/queue.js');
-const { getConfigFile, getScheduleFile } = require('./utils/filesUtils');
+getConfig();
+import { queues } from './queue/queue.js';
+import { getConfigFile, getScheduleFile } from './utils/filesUtils.js';
+import { getAppStatus, heartbeat } from './controller/appStatus.js';
+import { saveScheduleEvent } from './controller/schedule.js';
+import { getLogs } from './utils/logsUtils.js';
 
 const initServer = async () => {
 
   io.on("connection", async (socket) => {
     const requestToken = socket.handshake.auth.token;
-    const token = require('./config.js').config.preferences?.token?.toString();
+    const token = config.preferences?.token?.toString();
     if (token && requestToken !== token) {
       socket.emit('welcome_message', { status: 'error', message: 'Invalid token' });
       socket.disconnect();
@@ -41,43 +46,43 @@ const initServer = async () => {
       async (message, cb) => {
         switch (message.action) {
           case 'startWater':
-            await require('./controller/wateringCan.js').startWater(queues, message, io);
+            await startWater(queues, message, io);
             break;
           case 'stopWater':
-            await require('./controller/wateringCan.js').stopWater(queues, message, io);
+            await stopWater(queues, message, io);
             break;
           case 'getRemainingTimes':
-            require('./controller/wateringCan.js').getRemainingTimes(queues, message.device, io);
+            getRemainingTimes(queues, message.device, io);
             break;
           case 'editOutput':
-            require('./controller/wateringCan.js').editOutput(message, io);
+            editOutput(message, io);
             break;
           case 'editDevice':
-            require('./controller/wateringCan.js').editDevice(message, io);
+            editDevice(message, io);
             break;
           case 'editDeviceOutput':
-            require('./controller/wateringCan.js').editDeviceOutput(message, io);
+            editDeviceOutput(message, io);
             break;
           case 'calibrate':
-            require('./controller/wateringCan.js').calibrate(queues, message, io);
+            calibrate(queues, message, io);
             break;
           case 'stopCalibrating':
-            require('./controller/wateringCan.js').stopCalibrating(message, io);
+            stopCalibrating(message, io);
             break;
           case 'calculateRatio':
-            require('./controller/wateringCan.js').calculateRatio(message, io);
+            calculateRatio(message, io);
             break;
           case 'heartbeat':
-            require('./controller/appStatus.js').heartbeat(message, io);
+            heartbeat(message, io);
             break;
           case 'getAppStatus':
-            require('./controller/appStatus.js').getAppStatus(message, io);
+            getAppStatus(message, io);
             break;
           case 'configFileEdited':
-            require('./controller/wateringCan.js').configFileEdited(io);
+            configFileEdited(io);
             break;
           case 'syslog':
-            require('./controller/logs.js').syslog(message);
+            syslog(message);
             break;
         }
         cb && cb(message.action);
@@ -97,34 +102,32 @@ const initServer = async () => {
 
   app.post('/schedule', (req, res) => {
     const eventData = req.body;
-    res.json(require('./controller/schedule').saveScheduleEvent(eventData, 'add'));
+    res.json(saveScheduleEvent(eventData, 'add'));
   });
 
   app.put('/schedule', (req, res) => {
     const eventData = req.body;
-    res.json(require('./controller/schedule').saveScheduleEvent(eventData, 'edit'));
+    res.json(saveScheduleEvent(eventData, 'edit'));
   });
 
   app.delete('/schedule/:id', (req, res) => {
     const eventData = { id: req.params.id };
-    res.json(require('./controller/schedule').saveScheduleEvent(eventData, 'delete'));
+    res.json(saveScheduleEvent(eventData, 'delete'));
   });
 
   app.get('/gpio/:number/:state', (req, res) => {
-    require('./devices/gpio').setGpio(req.params.number, 'out', req.params.state === 'on' ? 1 : 0);
+    setGpio(req.params.number, 'out', req.params.state === 'on' ? 1 : 0);
     res.json({ status: 'success' });
   });
 
   app.post('/token', (req, res) => {
     const token = req.body.token;
-    const { config } = require('./config.js');
     config.preferences.token = token;
-    require('./config.js').saveConfig(config);
+    saveConfig(config);
     res.json({ token: config.preferences.token });
   });
 
   app.get('/logs/:type', (req, res) => {
-    const { getLogs } = require('./utils/logsUtils.js');
     const type = req.params.type;
     const date = req.query.date || null;
     const days = req.query.days || 7;
@@ -144,7 +147,7 @@ if (process.env.NODE_ENV !== 'test') {
   startServer();
 }
 
-module.exports = {
+export {
   app,
   io,
   initServer,

@@ -15,7 +15,7 @@ const getDateString = (date = new Date()) => {
   return `${year}-${month}-${day}`;
 }
 
-module.exports = {
+export {
   getDateString,
   getTimeString,
 };

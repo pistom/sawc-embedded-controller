@@ -1,9 +1,10 @@
-const fs = require('fs');
-const express = require('express');
-const { createFileIfNotExists, emptyFile } = require('../utils/filesUtils');
+import * as fs from 'fs';
+import express from 'express';
+import { createFileIfNotExists, emptyFile } from '../utils/filesUtils';
 const app = express();
 const port = 3031;
-const expressWs = require('express-ws')(app);
+import expressWs from 'express-ws';
+expressWs(app)
 const stateFile = './emulator/state.json';
 createFileIfNotExists(stateFile);
 emptyFile(stateFile);

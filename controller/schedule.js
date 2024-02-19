@@ -1,4 +1,5 @@
-const { getScheduleFile, saveScheduleFile } = require("../utils/filesUtils");
+import { getScheduleFile, saveScheduleFile } from '../utils/filesUtils.js';
+const schedule = getScheduleFile();
 
 const getTimeStringFromDateTimeString = (dateTimeString) => {
   if (/^([01]\d|2[0-3]):([0-5]\d)$/.test(dateTimeString)) return dateTimeString;
@@ -93,7 +94,7 @@ const saveScheduleEvent = (eventData, action = 'add') => {
       break;
   }
 
-  const schedule = require('../utils/filesUtils').getScheduleFile();
+  getScheduleFile();
   if (action === 'edit') {
     const eventIndex = schedule.events.findIndex(e => e.id === eventData.id);
     if (eventIndex > -1) {
@@ -110,11 +111,11 @@ const saveScheduleEvent = (eventData, action = 'add') => {
     event.id = getLastEventId(schedule) + 1;
     schedule.events.push(event);
   }
-  require('../utils/filesUtils').saveScheduleFile(schedule);
+  saveScheduleFile(schedule);
   return event;
 }
 
-module.exports = {
+export {
   saveScheduleEvent,
   getDataForAlwaysTypeEvent,
   getDataForPeriodTypeEvent,

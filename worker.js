@@ -1,5 +1,8 @@
-const { Manager } = require("socket.io-client");
-require('./config.js').getConfig();
+import { Manager } from "socket.io-client";
+import { config, getConfig } from "./config.js";
+import { getScheduleFile } from "./utils/filesUtils.js";
+import { getTimeString } from "./utils/dateUtils.js";
+getConfig();
 let lastMinuteData = [];
 
 const manager = new Manager("http://localhost:3001", {
@@ -8,7 +11,7 @@ const manager = new Manager("http://localhost:3001", {
 
 const socket = manager.socket("/", {
   auth: {
-    token: require('./config.js').config.preferences?.token?.toString(),
+    token: config.preferences?.token?.toString(),
   }
 });
 
@@ -21,7 +24,7 @@ socket.on("welcome_message", (data) => {
 
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const filterScheduleEventsToWaterToday = () => {
-  const allScheduleEvents = require('./utils/filesUtils').getScheduleFile().events;
+  const allScheduleEvents = getScheduleFile().events;
   return allScheduleEvents
     // Filter out events that are not scheduled to run today
     .filter(event => {
@@ -77,7 +80,7 @@ const getDataForStartWaterNow = (events) => {
   events.forEach(event => {
     event.watering.forEach((watering, index) => {
       if (lastMinuteData.find(item => item[1] === `${event.id}-${index}`)) return;
-      if (watering.time === require('./utils/dateUtils').getTimeString()) {
+      if (watering.time === getTimeString()) {
         data.push({
           device: event.device.toString(),
           output: event.output.toString(),

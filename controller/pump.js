@@ -1,10 +1,14 @@
+import { config } from '../config.js';
+import { getConfigFile } from '../utils/filesUtils.js';
+import { devices } from '../devices/index.js';
+
 const startPump = async (device) => {
-  const deviceType = require('../config').config.devices[device].type;
-  const delay = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOn || 0;
-  const devices = require('../devices').devices;
-  if (require('../config').config.devices[device].outputs['pump'].disabled) return;
+  const deviceType = config.devices[device].type;
+  const delay = getConfigFile().devices[device].outputs['pump'].delayOn || 0;
+  if (config.devices[device].outputs['pump'].disabled) return;
   if (!devices[device]?.outputs['pump']) {
-    await require(`../devices/${deviceType}`).initOutput(device, 'pump');
+    const module = await import(`../devices/${deviceType}.js`);
+    await module.initOutput(device, 'pump');
   }
   setTimeout(async () => {
     try {
@@ -14,14 +18,13 @@ const startPump = async (device) => {
 }
 
 const stopPump = async (device) => {
-  const devices = require('../devices').devices;
-  if (require('../config').config.devices[device].outputs['pump'].disabled) return;
+  if (config.devices[device].outputs['pump'].disabled) return;
   try {
     await devices[device]?.outputs['pump'].write(1);
   } catch (e) {}
 }
 
-module.exports = {
+export {
   startPump,
   stopPump,
 }

@@ -25,6 +25,6 @@ function sleep(duration) {
   return sleepObject;
 }
 
-module.exports = {
+export {
   sleep,
 }

@@ -1,8 +1,12 @@
-const { sleep } = require('../utils/sleep.js');
-const { outputOn, outputOff } = require('./inputOutput.js');
-const { startPump, stopPump } = require('./pump.js');
-const { Queue } = require('../queue/queue.js');
-const { Consumer } = require('../queue/consumer.js');
+import { sleep } from '../utils/sleep.js';
+import { outputOn, outputOff } from './inputOutput.js';
+import { startPump, stopPump } from './pump.js';
+import { Queue } from '../queue/queue.js';
+import { Consumer } from '../queue/consumer.js';
+import { logWatering } from '../utils/logsUtils.js';
+import { getConfigFile, saveConfigFile } from '../utils/filesUtils.js';
+import { config, getConfig } from '../config.js';
+import { calibrating } from './calibrating.js';
 
 /**
  * 
@@ -11,7 +15,7 @@ const { Consumer } = require('../queue/consumer.js');
  * @param {import('socket.io').Server} io 
  */
 const startWater = async (queues, message, io) => {
-  const calibrating = require('./calibrating.js');
+  const calibrating = import('./calibrating.js');
   if (calibrating.isCalibrating) {
     io.emit('message', { status: 'calibratingError', device: message.device, output: message.output, message: 'Cannot start water while calibrating' });
     return;
@@ -41,7 +45,6 @@ const startWater = async (queues, message, io) => {
  * @param {import('socket.io').Server} io
  */
 const stopWater = async (queues, message, io) => {
-  const { logWatering } = require('../utils/logsUtils');
   const { device, output, type, context } = message;
   const messageContent = { device, output, status: '', message: '', type, context };
   if (!queues[device]) {
@@ -54,7 +57,7 @@ const stopWater = async (queues, message, io) => {
       // Checki if the output is currently set to on
       if (queueElement.status === 'running') {
         queueElement.sleep?.resume();
-        const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
+        const delayOff = getConfigFile().devices[device].outputs['pump'].delayOff || 0;
         setTimeout(async () => {
           try {
             queueElement.endCallback(device, output);
@@ -99,7 +102,7 @@ const getRemainingTimes = (queues, device, io) => {
 
 const editOutput = (message, io) => {
   const { device, output, name, image, defaultVolume, ratio, sync, disabled, onlinePlantsIds, type, context } = message;
-  const config = require('../utils/filesUtils.js').getConfigFile();
+  const config = getConfigFile();
   const needToSync = config.devices[device].outputs[output].sync || sync;
 
   name !== undefined && (config.devices[device].outputs[output].name = name);
@@ -122,8 +125,8 @@ const editOutput = (message, io) => {
   onlinePlantsIds !== undefined && (config.devices[device].outputs[output].onlinePlantsIds = onlinePlantsIds);
   onlinePlantsIds?.length === 0 && config.devices[device].outputs[output]?.onlinePlantsIds && delete config.devices[device].outputs[output].onlinePlantsIds;
 
-  require('../utils/filesUtils.js').saveConfigFile(config);
-  require('../config.js').getConfig();
+  saveConfigFile(config);
+  getConfig();
 
   const messageContent = { config };
   type && (messageContent.type = type);
@@ -135,33 +138,32 @@ const editOutput = (message, io) => {
 
 const editDevice = (message, io) => {
   const { device, name, defaultVolume, defaultRatio, maxVolumePerOutput, calibrateDuration } = message;
-  const config = require('../utils/filesUtils.js').getConfigFile();
+  const config = getConfigFile();
   name ? (config.devices[device].name = name) : (config.devices[device].name = device);
   defaultRatio ? (config.devices[device].settings.defaultRatio = defaultRatio) : delete config.devices[device].settings.defaultRatio;
   defaultVolume ? (config.devices[device].settings.defaultVolume = defaultVolume) : delete config.devices[device].settings.defaultVolume;
   maxVolumePerOutput ? (config.devices[device].settings.maxVolumePerOutput = maxVolumePerOutput) : delete config.devices[device].settings.maxVolumePerOutput;
   calibrateDuration ? (config.devices[device].settings.calibrateDuration = calibrateDuration) : delete config.devices[device].settings.calibrateDuration;
-  require('../utils/filesUtils.js').saveConfigFile(config);
-  require('../config.js').getConfig();
+  saveConfigFile(config);
+  getConfig();
   io.emit('message', { status: 'configEdited', config});
   io.emit('message', { status: 'needToSyncDevicesWithOnlineApi', devices: config.devices});
 }
 
 const editDeviceOutput = (message, io) => {
   const { device, output, pin, disabled } = message;
-  const config = require('../utils/filesUtils.js').getConfigFile();
+  const config = getConfigFile();
   disabled !== undefined && (config.devices[device].outputs[output].disabled = disabled);
   pin >= 0 && (config.devices[device].outputs[output].pin = pin);
-  require('../utils/filesUtils.js').saveConfigFile(config);
-  require('../config.js').getConfig();
+  saveConfigFile(config);
+  getConfig();
   io.emit('message', { status: 'configOutputEdited', config, device, output})
   io.emit('message', { status: 'needToSyncDevicesWithOnlineApi', devices: config.devices});
 }
 
 const calibrate = async (queues, message, io) => {
-  const calibrating = require('./calibrating.js');
   const { device, output } = message;
-  const duration = require('../config.js').config.devices[device].settings.calibrateDuration;
+  const duration = config.devices[device].settings.calibrateDuration;
   calibrating.calibrateSleep = sleep(duration);
   if (calibrating.isCalibrating) {
     io.emit('message', { status: 'calibratingError', device, output, message: 'Already calibrating' });
@@ -189,7 +191,6 @@ const calibrate = async (queues, message, io) => {
 }
 
 const stopCalibrating = async (message, io) => {
-  const calibrating = require('./calibrating.js');
   if (calibrating.isCalibrating) {
     calibrating.calibrateSleep.cancel();
   }
@@ -197,18 +198,18 @@ const stopCalibrating = async (message, io) => {
 
 const calculateRatio = (message, io) => {
   const { device, output, volume, date } = message;
-  const duration = require('../config.js').config.devices[device].settings.calibrateDuration;
+  const duration = config.devices[device].settings.calibrateDuration;
   const ratio = Number((volume / duration).toFixed(2));
   io.emit('message', { status: 'ratioCalculated', ratio, device, output });
   return ratio;
 }
 
 const configFileEdited = io => {
-  const config = require('../utils/filesUtils.js').getConfigFile();
+  const config = getConfigFile();
   io.emit('message', { status: 'configFileEdited', config})
 }
 
-module.exports = {
+export {
   startWater,
   stopWater,
   getRemainingTimes,

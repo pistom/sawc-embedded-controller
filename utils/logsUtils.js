@@ -1,9 +1,18 @@
+import * as fs from 'fs'; 
+import { getDateString, getTimeString } from './dateUtils.js';
+import { createDirectoryIfNotExists, createFileIfNotExists } from './filesUtils.js';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+
 const getLogs = (type, startDate, days = 7) => {
-  const fs = require('fs');
   let logs = '';
   const date = startDate ? new Date(startDate) : new Date();
   for (let i = 0; i < days; i++) {
-    const dateString = require('./dateUtils').getDateString(date);
+    const dateString = getDateString(date);
     const logFile = `${__dirname}/../logs/${type}_${dateString}.log`;
     if (fs.existsSync(logFile)) {
       logs += `┌──────────┐\n│${dateString}│\n└──────────┘`;
@@ -16,12 +25,11 @@ const getLogs = (type, startDate, days = 7) => {
 }
 
 const log = (type, message) => {
-  const fs = require('fs');
-  const dateString = require('./dateUtils').getDateString();
-  const timeString = require('./dateUtils').getTimeString();
+  const dateString = getDateString();
+  const timeString = getTimeString();
   const fileName = `${__dirname}/../logs/${type}_${dateString}.log`;
-  require('./filesUtils').createDirectoryIfNotExists('logs');
-  require('./filesUtils').createFileIfNotExists(fileName, '');
+  createDirectoryIfNotExists('logs');
+  createFileIfNotExists(fileName, '');
   let line = `[${dateString} ${timeString}] `;
   line += message;
   fs.appendFileSync(fileName, `${line}\n`);
@@ -74,7 +82,7 @@ const inversLogLines = (logs) => {
   return inversLines;
 }
 
-module.exports = {
+export {
   getLogs,
   log,
   logWatering,

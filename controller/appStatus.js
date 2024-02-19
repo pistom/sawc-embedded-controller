@@ -33,7 +33,7 @@ const getAppStatus = (message, io) => {
   io.emit('message', messageContent);
 }
 
-module.exports = {
+export {
   heartbeat,
   getAppStatus,
 }

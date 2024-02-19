@@ -1,14 +1,14 @@
-const isPi = require('detect-rpi');
+import isPi from 'detect-rpi';
+import { devices } from '../devices/index.js';
 
 let GPIO
 if (isPi()) {
-  GPIO = require('onoff').Gpio;
+  GPIO = import('onoff').Gpio;
 } else {
-  GPIO = require('../emulator/mock.js').Gpio;
+  GPIO = import('../emulator/mock.js').Gpio;
 }
 
 const initOutput = (gpioNumber, direction) => {
-  const devices = require('../devices').devices;
   if (!devices.GPIO) {
     devices.GPIO = {};
   }
@@ -16,7 +16,6 @@ const initOutput = (gpioNumber, direction) => {
 }
 
 const setGpio = (gpioNumber, direction, state) => {
-  const devices = require('../devices').devices;
   if (!devices.GPIO || !devices.GPIO[gpioNumber]) {
     initOutput(gpioNumber, direction);
   } else if (devices.GPIO[gpioNumber]?.direction !== direction) {
@@ -26,6 +25,6 @@ const setGpio = (gpioNumber, direction, state) => {
   devices.GPIO[gpioNumber].writeSync(state);
 }
 
-module.exports = {
+export {
   setGpio,
 }

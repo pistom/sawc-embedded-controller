@@ -1,5 +1,5 @@
 const devicesMock = {}
 
-module.exports = {
+export {
   devicesMock
 }

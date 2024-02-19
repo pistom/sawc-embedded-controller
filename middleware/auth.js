@@ -1,5 +1,7 @@
+import { config } from '../config.js';
+
 const authMiddleware = (req, res, next) => {
-  const token = require('../config.js').config.preferences?.token?.toString();
+  const token = config.preferences?.token?.toString();
   if (token && req.headers.authorization !== `Bearer ${token}`) {
     res.status(401).json({ status: 'error', message: 'Invalid token' });
     return;
@@ -7,4 +9,4 @@ const authMiddleware = (req, res, next) => {
   next();
 }
 
-module.exports = authMiddleware;
+export default authMiddleware;

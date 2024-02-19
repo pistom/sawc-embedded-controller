@@ -1,4 +1,4 @@
-const { getConfigFile, saveConfigFile } = require('./utils/filesUtils');
+import { getConfigFile, saveConfigFile } from './utils/filesUtils.js';
 
 const config = {
   preferences: {},
@@ -10,12 +10,13 @@ const getConfig = () => {
   config.devices = configFile.devices;
   config.preferences = configFile.preferences;
 }
+
 const saveConfig = (config) => {
   saveConfigFile(config);
   getConfig();
 }
 
-module.exports = {
+export {
   config,
   getConfig,
   saveConfig,

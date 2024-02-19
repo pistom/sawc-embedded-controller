@@ -1,6 +1,7 @@
-const { i2c, MODE_OUTPUT, OUTPUT_LOW, OUTPUT_HIGH } = require('@mrvanosh/mcp23x17');
-const { config } = require('../config');
-const isPi = require('detect-rpi');
+const { i2c, MODE_OUTPUT, OUTPUT_LOW, OUTPUT_HIGH } = import('@mrvanosh/mcp23x17');
+import { config } from '../config.js';
+import isPi from 'detect-rpi';
+import { devices } from '../devices/index.js';
 
 
 /**
@@ -8,16 +9,16 @@ const isPi = require('detect-rpi');
  * @param {string} device 
  */
 const initDevice = async (device) => {
-  const devices = require('../devices').devices;
   let MCP23x17;
   let bus;
   let mcp;
   if (isPi()) {
-    const { MCP23x17 } = require('@mrvanosh/mcp23x17');
+    const { MCP23x17 } = import('@mrvanosh/mcp23x17');
     bus = new i2c(1);
     mcp = new MCP23x17(bus, config.devices[device].address);
   } else {
-    MCP23x17 = require('../emulator/mock.js').MCP23x17;
+    const mock = import('../emulator/mock.js');
+    MCP23x17 = (await mock).MCP23x17;
     bus = null;
     mcp = new MCP23x17(device);
   }
@@ -35,11 +36,10 @@ const initDevice = async (device) => {
  * @param {string} output 
  */
 const initOutput = async (device, output) => {
-  const devices = require('../devices').devices;
   if (!devices[device]) {
     await initDevice(device);
   }
-  const pin = require('../config').config.devices[device].outputs[output].pin
+  const pin = config.devices[device].outputs[output].pin
   if (!devices[device].outputs[output]) {
     devices[device].outputs[output] = await devices[device]
       .mcp
@@ -52,7 +52,6 @@ const initOutput = async (device, output) => {
 }
 
 const initInput = async (device) => {
-  const devices = require('../devices').devices;
   if (!devices[device]) {
     await initDevice(device);
   }
@@ -72,7 +71,7 @@ const initInput = async (device) => {
 
 
 
-module.exports = {
+export {
   initDevice,
   initOutput,
   initInput,
