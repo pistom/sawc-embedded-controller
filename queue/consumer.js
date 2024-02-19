@@ -39,7 +39,10 @@ class Consumer {
         }
       } catch (error) {
         message.status = 'error';
-        message.context = {...context, ...error.cause};
+        message.context = {...context, ...error};
+        if (error.cause) {
+          message.context = {...message.context, ...error.cause}
+        }
         io.emit('message', message);
         logWatering(message);
         queue.shift();

@@ -40,7 +40,7 @@ class Queue {
     if (volume > device.settings.maxVolumePerOutput) {
       volume = device.settings.maxVolumePerOutput;
     }
-    const outputRatio = device.outputs[output].ratio || device.settings.defaultRatio;
+    const outputRatio = device.outputs[output]?.ratio || device.settings.defaultRatio;
     return Number((volume / outputRatio).toFixed(0));
   }
 
