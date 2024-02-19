@@ -23,6 +23,7 @@
     "express-ws": "^5.0.2",
     "http-server": "^14.1.1",
     "js-yaml": "^4.1.0",
+    "node-fetch": "2",
     "node-mcp23017": "^0.1.0",
     "onoff": "^6.0.3",
     "react": "^18.2.0",
