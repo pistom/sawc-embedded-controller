@@ -145,7 +145,7 @@ const editDevice = (message, io) => {
   calibrateDuration ? (config.devices[device].settings.calibrateDuration = calibrateDuration) : delete config.devices[device].settings.calibrateDuration;
   require('../utils/filesUtils.js').saveConfigFile(config);
   require('../config.js').getConfig();
-  const devices = require('../devices/index.js');
+  const devices = require('../devices/index.js').devices;
   devices[device]?.outputs && (devices[device].outputs = []);
   io.emit('message', { status: 'configEdited', config});
   io.emit('message', { status: 'needToSyncDevicesWithOnlineApi', devices: config.devices});
