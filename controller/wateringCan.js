@@ -134,15 +134,19 @@ const editOutput = (message, io) => {
 }
 
 const editDevice = (message, io) => {
-  const { device, name, defaultVolume, defaultRatio, maxVolumePerOutput, calibrateDuration } = message;
+  const { device, name, address, token, defaultVolume, defaultRatio, maxVolumePerOutput, calibrateDuration } = message;
   const config = require('../utils/filesUtils.js').getConfigFile();
   name ? (config.devices[device].name = name) : (config.devices[device].name = device);
+  address ? (config.devices[device].address = address) : "https://";
+  token ? (config.devices[device].token = token) : "";
   defaultRatio ? (config.devices[device].settings.defaultRatio = defaultRatio) : delete config.devices[device].settings.defaultRatio;
   defaultVolume ? (config.devices[device].settings.defaultVolume = defaultVolume) : delete config.devices[device].settings.defaultVolume;
   maxVolumePerOutput ? (config.devices[device].settings.maxVolumePerOutput = maxVolumePerOutput) : delete config.devices[device].settings.maxVolumePerOutput;
   calibrateDuration ? (config.devices[device].settings.calibrateDuration = calibrateDuration) : delete config.devices[device].settings.calibrateDuration;
   require('../utils/filesUtils.js').saveConfigFile(config);
   require('../config.js').getConfig();
+  const devices = require('../devices/index.js');
+  devices[device]?.outputs && (devices[device].outputs = []);
   io.emit('message', { status: 'configEdited', config});
   io.emit('message', { status: 'needToSyncDevicesWithOnlineApi', devices: config.devices});
 }

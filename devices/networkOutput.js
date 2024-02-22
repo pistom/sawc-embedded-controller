@@ -22,18 +22,14 @@ class NetworkOutput {
   async outputOn(duration) {
     const response = await this.requestDevice('on', duration);
     if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("Not found", { "cause": { "errno": -123 } });
-      }
+      this.throwError(response.status);
     }
   }
 
   async outputOff(nextOutput) {
     const response = await this.requestDevice('off', null, nextOutput);
     if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("Not found", { "cause": { "errno": -123 } });
-      }
+      this.throwError(response.status);
     }
   }
 
@@ -60,8 +56,17 @@ class NetworkOutput {
       headers: { 'Content-Type': 'text/plain' },
       agent: httpsAgent,
     });
-
   }
+  
+  throwError(status) {
+    switch (status) {
+      case 404:
+        throw new Error("Not found", { "cause": { "errno": -123 } });
+      case 401:
+        throw new Error("Unauthorized", { "cause": { "errno": "INVALIDTOKEN" } });
+    }
+  }
+
 }
 
 module.exports = NetworkOutput;
