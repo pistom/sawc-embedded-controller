@@ -177,7 +177,7 @@ const calibrate = async (queues, message, io) => {
   }
   calibrating.isCalibrating = true;
   await startPump(device);
-  await outputOn(device, output);
+  await outputOn(device, output, duration);
   io.emit('message', { status: 'calibratingWaterStarted', duration, device, output });
   calibrating.calibrateSleep.promise.then(async () => {
     await stopPump(device);

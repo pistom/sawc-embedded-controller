@@ -42,7 +42,8 @@ class NetworkOutput {
       body += `&duration=${duration}`;
     }
     if (this.deviceConfig.outputs['pump'] && !this.deviceConfig.outputs['pump'].disabled) {
-      body += `&pumpDelayOff=${this.deviceConfig.outputs['pump'].delayOff / 1000 | 0}`;
+      const delay = this.deviceConfig.outputs['pump'].delayOff / 1000 || 0;
+      body += `&pumpDelayOff=${Math.ceil(delay)}`;
     }
     if (nextOutput) {
       body += `&nextOutput=${nextOutput}`;
