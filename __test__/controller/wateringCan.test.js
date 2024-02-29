@@ -76,7 +76,7 @@ describe('calibrate', () => {
     calibrate(queues, calibrateMessage, ioMock);
     await jest.runAllTimers();
     expect(startPump).toHaveBeenCalledWith('MODULE_01');
-    expect(outputOn).toHaveBeenCalledWith('MODULE_01', '1');
+    expect(outputOn).toHaveBeenCalledWith('MODULE_01', '1', 10);
     await jest.runAllTimers();
     expect(ioMock.emit).toHaveBeenCalledWith('message', { status: 'calibratingWaterStarted', duration: 10, device: 'MODULE_01', output: '1' });
     await jest.runAllTimers();
