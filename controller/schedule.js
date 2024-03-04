@@ -25,9 +25,9 @@ const getCommonData = (eventData) => {
     volume: watering.volume,
   }));
   const event = {
-    type: eventData.type,
-    output: eventData.output,
-    device: eventData.device,
+    type: `${eventData.type}`,
+    output: `${eventData.output}`,
+    device: `${eventData.device}`,
     startDate: getDateStringFromDateTimeString(eventData.startDate),
     watering,
   };
