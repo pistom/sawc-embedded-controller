@@ -34,7 +34,7 @@ body {
   width: 40px;
   position: absolute;
   top: 120.5px;
-  left: 720.5px;
+  left: 270px;
   line-height: 0;
 }
 .mcp23017_module {
@@ -49,7 +49,7 @@ body {
   left: 249px;
 }
 #MODULE_02 {
-  left: 849px;
+  left: 929px;
 }
 .pin, .module_pin {
   display: inline-block;
@@ -161,67 +161,67 @@ body {
 }
 .relay_output_B0 {
   top: 300px;
-  right: 0;
+  right: -40px;
 }
 .relay_output_A7 {
   top: 350px;
-  right: 0;
+  right: -40px;
 }
 .relay_output_B1 {
   top: 200px;
-  right: 0;
+  right: -40px;
 }
 .relay_output_A6 {
   top: 250px;
-  right: 0;
+  right: -40px;
 }
 .relay_output_B2 {
   top: 100px;
-  right: 0;
+  right: -40px;
 }
 .relay_output_A5 {
   top: 150px;
-  right: 0;
+  right: -40px;
 }
 .relay_output_B3 {
   top: 0;
-  right: 0;
+  right: -40px;
 }
 .relay_output_A4 {
   top: 50px;
-  right: 0;
+  right: -40px;
 }
 .relay_output_B4 {
   top: 50px;
-  left: 0;
+  left: -40px;
 }
 .relay_output_A3 {
   top: 0;
-  left: 0;
+  left: -40px;
 }
 .relay_output_B5 {
   top: 150px;
-  left: 0;
+  left: -40px;
 }
 .relay_output_A2 {
   top: 100px;
-  left: 0;
+  left: -40px;
 }
 .relay_output_B6 {
   top: 250px;
-  left: 0;
+  left: -40px;
 }
 .relay_output_A1 {
   top: 200px;
-  left: 0;
+  left: -40px;
 }
 .relay_output_B7 {
   top: 350px;
-  left: 0;
+  left: -40px;
 }
 .relay_output_A0 {
   top: 300px;
-  left: 0;
+  left: -40px;
 }
 .gpio_high, .output_high  {
 	background-color: #83ad5f;
