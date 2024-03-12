@@ -30,7 +30,7 @@ describe('schedule', () => {
     expect(event).toEqual({
       id: 1,
       type: 'always',
-      output: 1,
+      output: "1",
       startDate: '2020-01-01',
       device: 'MODULE_01',
       days: ['Monday', 'Tuesday'],
@@ -46,7 +46,7 @@ describe('schedule', () => {
     const eventData = {
       id: -1,
       type: 'period',
-      output: 1,
+      output: "1",
       device: 'MODULE_01',
       // days: ['Monday', 'Tuesday'],
       watering: [{time: '2000-01-01T12:00', volume: 100}],
@@ -58,7 +58,7 @@ describe('schedule', () => {
     expect(event).toEqual({
       id: 5,
       type: 'period',
-      output: 1,
+      output: "1",
       device: 'MODULE_01',
       // days: ['Monday', 'Tuesday'],
       repeatEvery: 2,
@@ -76,7 +76,7 @@ describe('schedule', () => {
     const eventData = {
       id: -1,
       type: 'once',
-      output: 1,
+      output: "1",
       device: 'MODULE_01',
       watering: [{time: 'wrong-time', volume: 100}],
       startDate: '2020-01-01',
@@ -85,7 +85,7 @@ describe('schedule', () => {
     expect(event).toEqual({
       id: 5,
       type: 'once',
-      output: 1,
+      output: "1",
       device: 'MODULE_01',
       watering: [{time: '00:00', volume: 100}],
       startDate: '2020-01-01',
@@ -101,7 +101,7 @@ describe('schedule', () => {
     const eventData = {
       id: 1,
       type: 'always',
-      output: 1,
+      output: "1",
       device: 'MODULE_01',
       startDate: '2020-01-01',
       repeatEvery: 2,
@@ -111,7 +111,7 @@ describe('schedule', () => {
     expect(event).toEqual({
       id: 1,
       type: 'always',
-      output: 1,
+      output: "1",
       device: 'MODULE_01',
       repeatEvery: 2,
       startDate: '2020-01-01',
