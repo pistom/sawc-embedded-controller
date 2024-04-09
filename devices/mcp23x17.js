@@ -25,7 +25,7 @@ const initDevice = async (device) => {
 
   devices[device] = devices[device] || {};
   devices[device].bus = bus;
-  devices[device].mcp = mcp;
+  devices[device].mcp= mcp;
   devices[device].outputs = {};
 }
 

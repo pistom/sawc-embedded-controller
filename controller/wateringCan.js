@@ -17,6 +17,15 @@ const startWater = async (queues, message, io) => {
     return;
   }
   const { device, output, volume, type, dateTime, context } = message;
+
+  // Wait for the empty queue is removed
+  if (queues[device]?.queue.length === 0) {
+    while (queues[device]) {
+      await sleep(1).promise;
+    }
+  }
+  
+  // Create queue if not exists
   if (!queues[device]) {
     try {
       await startPump(device);
@@ -51,13 +60,13 @@ const stopWater = async (queues, message, io) => {
     const queueElement = queues[device].unqueue(output);
     // Check if the output is in the queue
     if (queueElement) {
-      // Checki if the output is currently set to on
+      // Check if the output is currently set to on
       if (queueElement.status === 'running') {
         queueElement.sleep?.resume();
         const delayOff = require('../utils/filesUtils').getConfigFile().devices[device].outputs['pump'].delayOff || 0;
         setTimeout(async () => {
           try {
-            queueElement.endCallback(device, output);
+            await queueElement.endCallback(device, output);
           } catch (e) {
           }
         }, delayOff);
@@ -72,7 +81,7 @@ const stopWater = async (queues, message, io) => {
     }
     if (queues[device].queue.length === 0) {
       try {
-        stopPump(device);
+        await stopPump(device);
       } catch(e) {
         console.error(e)
       }

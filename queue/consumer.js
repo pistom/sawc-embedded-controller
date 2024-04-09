@@ -24,6 +24,7 @@ class Consumer {
         io.emit('message', message);
         logWatering(message);
         queue.queue[0].sleep = sleep(duration);
+        io.emit('message', { status: 'remainingTimes', device, remainingTimes: queues[device].getRemainingTimes() });
         await queue.queue[0].sleep.promise;
         if (queue.queue[0]?.output === output) {
           if(queue.queue[1]) {
