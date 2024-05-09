@@ -1,5 +1,3 @@
-const isPi = require('detect-rpi');
-
 const initDevice = async (device) => {
   const devices = require('../devices').devices;
 
