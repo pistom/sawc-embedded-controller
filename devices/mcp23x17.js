@@ -1,7 +1,5 @@
 const { i2c, MODE_OUTPUT, OUTPUT_LOW, OUTPUT_HIGH } = require('@mrvanosh/mcp23x17');
 const { config } = require('../config');
-const isPi = require('detect-rpi');
-
 
 /**
  * 
@@ -12,7 +10,7 @@ const initDevice = async (device) => {
   let MCP23x17;
   let bus;
   let mcp;
-  if (isPi()) {
+  if (process.env.NODE_ENV === 'prod' ) {
     const { MCP23x17 } = require('@mrvanosh/mcp23x17');
     bus = new i2c(1);
     mcp = new MCP23x17(bus, config.devices[device].address);

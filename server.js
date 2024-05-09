@@ -1,7 +1,6 @@
 const express = require('express');
 const http = require("http");
 const cors = require('cors');
-const isPi = require('detect-rpi');
 const { Server } = require("socket.io");
 const { WaterMessage } = require('./types');
 
@@ -136,7 +135,7 @@ const initServer = async () => {
 
 const startServer = async () => {
   (await initServer()).listen(port, () => {
-    console.log(`SAWC controller listening on port ${port} (${isPi() ? 'ON' : 'OFF'} a Raspberry Pi)`);
+    console.log(`SAWC controller listening on port ${port} (${process.env.NODE_ENV === 'prod' ? 'ON' : 'OFF'} a Raspberry Pi)`);
   });
 };
 

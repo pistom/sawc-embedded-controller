@@ -1,7 +1,5 @@
-const isPi = require('detect-rpi');
-
 let GPIO
-if (isPi()) {
+if (process.env.NODE_ENV === 'prod' ) {
   GPIO = require('onoff').Gpio;
 } else {
   GPIO = require('../emulator/mock.js').Gpio;

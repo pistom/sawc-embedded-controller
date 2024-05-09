@@ -86,7 +86,7 @@ const stopWater = async (queues, message, io) => {
         console.error(e)
       }
     }
-    io.emit('message', { status: 'remainingTimes', device, remainingTimes: queues[device].getRemainingTimes() });
+    io.emit('message', { status: 'remainingTimes', device, remainingTimes: queues[device]?.getRemainingTimes() || {} });
   }
   type && (messageContent.type = type);
   context && (messageContent.context = context);
